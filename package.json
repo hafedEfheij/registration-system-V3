@@ -5,8 +5,7 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "dev": "nodemon server/server.js",
-    "glitch": "bash start.sh"
+    "dev": "nodemon server/server.js"
   },
   "dependencies": {
     "body-parser": "^1.20.2",

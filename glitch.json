@@ -1,6 +1,6 @@
 {
   "install": "npm install",
-  "start": "bash start.sh",
+  "start": "node server.js",
   "watch": {
     "ignore": [
       "\\.data"
