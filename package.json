@@ -1,19 +1,18 @@
 {
-  "name": "hadhara-university-registration-system",
+  "name": "glitch-resignation-system",
   "version": "1.0.0",
-  "description": "Course registration system for Hadhara University",
-  "main": "server/server.js",
+  "description": "University Registration System for Glitch",
+  "main": "index.js",
   "scripts": {
-    "start": "node server/server.js",
-    "dev": "nodemon server/server.js"
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "14.x"
   },
   "dependencies": {
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "sqlite3": "^5.1.6"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
   }
 }
