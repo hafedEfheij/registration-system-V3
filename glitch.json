@@ -1,0 +1,21 @@
+{
+  "install": "npm install",
+  "start": "npm run glitch",
+  "watch": {
+    "ignore": [
+      "\\.data"
+    ],
+    "install": {
+      "include": [
+        "^package\\.json$"
+      ]
+    },
+    "restart": {
+      "include": [
+        "^server/",
+        "^public/"
+      ]
+    },
+    "throttle": 1000
+  }
+}

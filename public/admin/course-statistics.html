@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إحصائيات المواد - جامعة الحاضرة</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <img src="../images/images.jpg" alt="شعار الجامعة" class="img-fluid mb-3" style="max-height: 80px;">
+                        <h5 class="text-white">جامعة الحاضرة</h5>
+                        <p class="text-white fw-bold">لوحة تحكم المشرف</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fas fa-tachometer-alt"></i>
+                                لوحة التحكم
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="students.html">
+                                <i class="fas fa-user-graduate"></i>
+                                إدارة الطلبة
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="departments.html">
+                                <i class="fas fa-building"></i>
+                                إدارة التخصصات
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="courses.html">
+                                <i class="fas fa-book"></i>
+                                إدارة المواد
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="course-statistics.html">
+                                <i class="fas fa-chart-bar"></i>
+                                إحصائيات المواد
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.html">
+                                <i class="fas fa-user-cog"></i>
+                                إعدادات الحساب
+                            </a>
+                        </li>
+                        <li class="nav-item mt-5">
+                            <a class="nav-link text-danger" href="#" id="logout-button">
+                                <i class="fas fa-sign-out-alt"></i>
+                                تسجيل الخروج
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">إحصائيات المواد</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i>
+                                <span id="user-name">المشرف</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="profile.html">إعدادات الحساب</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logout-button">تسجيل الخروج</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="card-title mb-0">تصفية النتائج</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-6 mb-3">
+                                        <label for="stats-filter-department-select" class="form-label">التخصص</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-university"></i>
+                                            </span>
+                                            <select class="form-select" id="stats-filter-department-select">
+                                                <option value="">جميع التخصصات</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 mb-3">
+                                        <label for="stats-filter-semester-select" class="form-label">الفصل الدراسي</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-layer-group"></i>
+                                            </span>
+                                            <select class="form-select" id="stats-filter-semester-select">
+                                                <option value="">جميع الفصول الدراسية</option>
+                                                <option value="الأول">الفصل الأول</option>
+                                                <option value="الثاني">الفصل الثاني</option>
+                                                <option value="الثالث">الفصل الثالث</option>
+                                                <option value="الرابع">الفصل الرابع</option>
+                                                <option value="الخامس">الفصل الخامس</option>
+                                                <option value="السادس">الفصل السادس</option>
+                                                <option value="السابع">الفصل السابع</option>
+                                                <option value="الثامن">الفصل الثامن</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 mb-3">
+                                        <label for="stats-search" class="form-label">بحث</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="stats-search" placeholder="ابحث عن مادة...">
+                                            <button class="btn btn-outline-secondary" type="button" id="stats-search-btn">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 mb-3">
+                                        <div class="d-flex justify-content-md-start justify-content-center mt-md-4 mt-2">
+                                            <button class="btn btn-primary me-2" id="refresh-course-stats">
+                                                <i class="fas fa-sync"></i> <span class="d-none d-sm-inline">تحديث</span>
+                                            </button>
+                                            <button class="btn btn-secondary" id="reset-stats-filters">
+                                                <i class="fas fa-undo"></i> <span class="d-none d-sm-inline">إعادة ضبط</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <div id="current-stats-filters" class="alert alert-info d-none">
+                                            <i class="fas fa-filter"></i> <span id="current-stats-filter-text">عرض جميع المواد</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Section -->
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">إحصائيات المواد</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="course-stats-loading" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">جاري التحميل...</span>
+                                    </div>
+                                    <p>جاري تحميل الإحصائيات...</p>
+                                </div>
+                                <div id="course-stats-error" class="alert alert-danger d-none" role="alert">
+                                    حدث خطأ أثناء تحميل الإحصائيات
+                                </div>
+                                <div id="course-stats-content" class="d-none">
+                                    <div class="table-responsive-stack">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>رمز المادة</th>
+                                                    <th>اسم المادة</th>
+                                                    <th class="d-none d-md-table-cell">التخصص</th>
+                                                    <th class="d-none d-lg-table-cell">الفصل الدراسي</th>
+                                                    <th>عدد الطلبة</th>
+                                                    <th class="d-none d-sm-table-cell">الحد الأقصى</th>
+                                                    <th class="text-center">نسبة التسجيل</th>
+                                                    <th class="text-center">الإجراءات</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="course-stats-table-body">
+                                                <!-- Course statistics will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Section -->
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="card-title mb-0">ملخص الإحصائيات</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-6 col-sm-6 mb-3">
+                                        <div class="card bg-primary text-white h-100">
+                                            <div class="card-body text-center d-flex flex-column justify-content-center">
+                                                <h5 class="card-title">إجمالي المواد</h5>
+                                                <h2 id="total-courses">-</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-sm-6 mb-3">
+                                        <div class="card bg-success text-white h-100">
+                                            <div class="card-body text-center d-flex flex-column justify-content-center">
+                                                <h5 class="card-title">إجمالي التسجيلات</h5>
+                                                <h2 id="total-enrollments">-</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-sm-6 mb-3">
+                                        <div class="card bg-warning text-dark h-100">
+                                            <div class="card-body text-center d-flex flex-column justify-content-center">
+                                                <h5 class="card-title">متوسط نسبة التسجيل</h5>
+                                                <h2 id="avg-enrollment-rate">-</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-sm-6 mb-3">
+                                        <div class="card bg-danger text-white h-100">
+                                            <div class="card-body text-center d-flex flex-column justify-content-center">
+                                                <h5 class="card-title">المواد الممتلئة</h5>
+                                                <h2 id="full-courses">-</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Students Modal -->
+    <div class="modal fade" id="courseStudentsModal" tabindex="-1" aria-labelledby="courseStudentsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="courseStudentsModalLabel">الطلبة المسجلين في المادة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="course-students-loading" class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">جاري التحميل...</span>
+                        </div>
+                        <p>جاري تحميل بيانات الطلبة...</p>
+                    </div>
+                    <div id="course-students-error" class="alert alert-danger d-none" role="alert">
+                        حدث خطأ أثناء تحميل بيانات الطلبة
+                    </div>
+                    <div id="course-students-content" class="d-none">
+                        <div class="mb-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title" id="modal-course-name">اسم المادة</h5>
+                                    <div class="row">
+                                        <div class="col-md-4 col-sm-6 mb-2">
+                                            <p class="mb-1"><strong>رمز المادة:</strong> <span id="modal-course-code"></span></p>
+                                            <p class="mb-1"><strong>التخصص:</strong> <span id="modal-course-department"></span></p>
+                                        </div>
+                                        <div class="col-md-4 col-sm-6 mb-2">
+                                            <p class="mb-1"><strong>عدد الطلبة المسجلين:</strong> <span id="modal-enrolled-students"></span></p>
+                                            <p class="mb-1"><strong>الحد الأقصى للطلبة:</strong> <span id="modal-max-students"></span></p>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12 mb-2">
+                                            <p class="mb-1"><strong>نسبة التسجيل:</strong> <span id="modal-enrollment-percentage"></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5>قائمة الطلبة المسجلين</h5>
+                        <div class="table-responsive-stack">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell">#</th>
+                                        <th>رقم القيد</th>
+                                        <th>اسم الطالب</th>
+                                        <th class="d-none d-md-table-cell">رقم المنظومة</th>
+                                        <th class="d-none d-lg-table-cell">التخصص</th>
+                                        <th class="d-none d-md-table-cell">الفصل الدراسي</th>
+                                        <th class="d-none d-sm-table-cell">تاريخ التسجيل</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="course-students-table-body">
+                                    <!-- Students will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="alert alert-info d-none" id="no-students-message">
+                            لا يوجد طلبة مسجلين في هذه المادة
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer flex-wrap justify-content-center justify-content-sm-between">
+                    <div class="mb-2 mb-sm-0">
+                        <button type="button" class="btn btn-success me-2" id="export-students-excel">
+                            <i class="fas fa-file-excel"></i> <span class="d-none d-sm-inline">تصدير Excel</span>
+                        </button>
+                        <button type="button" class="btn btn-info me-2" id="view-students-pdf">
+                            <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">عرض التقرير</span>
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SheetJS (XLSX) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- html2pdf for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- PDF Export functionality -->
+    <script src="../js/pdf-export.js"></script>
+
+    <!-- Responsive functionality -->
+    <script src="../js/responsive-stats.js"></script>
+
+    <!-- Modal Fixes JS -->
+    <script src="../js/modal-fixes.js"></script>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
