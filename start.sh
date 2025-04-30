@@ -11,5 +11,5 @@ if [ ! -f .data/university.db ]; then
   fi
 fi
 
-# Start the server
-npm start
+# Start the server directly
+node server/server.js
