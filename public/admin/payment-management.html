@@ -634,19 +634,51 @@
                             filteredStudents = filteredStudents.filter(student => {
                                 // Si el estudiante no tiene inscripciones, no coincide con ningún filtro de pago
                                 if (!student.enrollments || student.enrollments.length === 0) {
+                                    console.log(`Estudiante ${student.name || student.id}: Sin inscripciones, excluido del filtro de pago`);
                                     return false;
                                 }
 
-                                if (filterPaymentStatus === 'خالص') {
-                                    // Para "خالص" (pagado), todas las inscripciones deben estar pagadas
-                                    return student.enrollments.every(enrollment =>
-                                        enrollment.payment_status === 'paid' || enrollment.payment_status === 'خالص'
-                                    );
-                                } else if (filterPaymentStatus === 'غير خالص') {
-                                    // Para "غير خالص" (no pagado), al menos una inscripción debe estar sin pagar
-                                    return student.enrollments.some(enrollment =>
-                                        enrollment.payment_status === 'unpaid' || enrollment.payment_status === 'غير خالص'
-                                    );
+                                // Usar el resumen de estado de pago si está disponible
+                                if (student.payment_status_summary) {
+                                    if (filterPaymentStatus === 'خالص') {
+                                        // Para "خالص" (pagado), todas las inscripciones deben estar pagadas
+                                        console.log(`Estudiante ${student.name}: Usando resumen - Todas pagadas? ${student.payment_status_summary.all_paid}`);
+                                        return student.payment_status_summary.all_paid;
+                                    } else if (filterPaymentStatus === 'غير خالص') {
+                                        // Para "غير خالص" (no pagado), al menos una inscripción debe estar sin pagar
+                                        console.log(`Estudiante ${student.name}: Usando resumen - Alguna sin pagar? ${student.payment_status_summary.any_unpaid}`);
+                                        return student.payment_status_summary.any_unpaid;
+                                    }
+                                } else {
+                                    // Si no hay resumen, calcular manualmente
+                                    console.log(`Estudiante ${student.name}: Sin resumen, calculando estado de pago manualmente`);
+
+                                    // Normalizar los estados de pago para cada inscripción
+                                    const normalizedEnrollments = student.enrollments.map(enrollment => {
+                                        // Asegurarse de que payment_status tenga un valor válido
+                                        const status = enrollment.payment_status || 'غير خالص';
+                                        // Normalizar el estado a un formato estándar
+                                        return {
+                                            ...enrollment,
+                                            normalized_status: (status === 'paid' || status === 'خالص') ? 'خالص' : 'غير خالص'
+                                        };
+                                    });
+
+                                    if (filterPaymentStatus === 'خالص') {
+                                        // Para "خالص" (pagado), todas las inscripciones deben estar pagadas
+                                        const allPaid = normalizedEnrollments.every(enrollment =>
+                                            enrollment.normalized_status === 'خالص'
+                                        );
+                                        console.log(`Estudiante ${student.name}: Todas pagadas? ${allPaid}`);
+                                        return allPaid;
+                                    } else if (filterPaymentStatus === 'غير خالص') {
+                                        // Para "غير خالص" (no pagado), al menos una inscripción debe estar sin pagar
+                                        const anyUnpaid = normalizedEnrollments.some(enrollment =>
+                                            enrollment.normalized_status === 'غير خالص'
+                                        );
+                                        console.log(`Estudiante ${student.name}: Alguna sin pagar? ${anyUnpaid}`);
+                                        return anyUnpaid;
+                                    }
                                 }
 
                                 // Si el filtro no coincide con ninguno de los valores esperados, no filtrar
