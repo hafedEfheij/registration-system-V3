@@ -459,84 +459,39 @@
                             // Mostrar información de semestres disponibles
                             const semestresDisponibles = new Set();
 
-                            // Primero verificamos si el estudiante tiene un semestre asignado directamente
+                            // Verificamos si el estudiante tiene un semestre asignado directamente
                             filteredStudents.forEach(student => {
                                 if (student.semester) {
                                     semestresDisponibles.add(student.semester);
                                 }
                             });
 
-                            // Luego verificamos los semestres en las inscripciones
-                            filteredStudents.forEach(student => {
-                                if (student.enrollments && student.enrollments.length > 0) {
-                                    student.enrollments.forEach(enrollment => {
-                                        if (enrollment.semester) {
-                                            semestresDisponibles.add(enrollment.semester);
-                                        }
-                                    });
-                                }
-                            });
-
                             console.log('Semestres disponibles en los datos:', Array.from(semestresDisponibles));
 
-                            // Implementamos el filtro por semestre considerando tanto el semestre del estudiante
-                            // como los semestres de sus inscripciones
+                            // Implementamos el filtro por semestre considerando SOLO el semestre del estudiante
+                            // y NO los semestres de sus inscripciones
                             filteredStudents = filteredStudents.filter(student => {
                                 // Verificar si el estudiante tiene un semestre asignado que coincide con el filtro
-                                if (student.semester && student.semester === filterSemester) {
-                                    return true;
-                                }
+                                const coincide = student.semester && student.semester === filterSemester;
 
-                                // Si el estudiante no tiene inscripciones, verificamos solo su semestre
-                                if (!student.enrollments || student.enrollments.length === 0) {
-                                    return student.semester === filterSemester;
+                                if (coincide) {
+                                    console.log(`Estudiante ${student.name} coincide por semestre: ${student.semester}`);
                                 }
-
-                                // Verificar si alguna inscripción coincide con el semestre
-                                const coincide = student.enrollments.some(enrollment => {
-                                    return enrollment.semester === filterSemester;
-                                });
 
                                 return coincide;
                             });
 
                             console.log('Estudiantes después del filtro de semestre:', filteredStudents.length);
 
-                            // Si no hay resultados después del filtro, mostramos todos los estudiantes
-                            // pero sin mostrar un mensaje de advertencia
+                            // Si no hay resultados después del filtro, mostramos un mensaje personalizado
                             if (filteredStudents.length === 0) {
                                 console.warn('No se encontraron estudiantes para el semestre:', filterSemester);
-                                console.warn('Mostrando todos los estudiantes...');
 
-                                // Recuperamos todos los estudiantes nuevamente
-                                filteredStudents = data.students;
-
-                                // Aplicamos nuevamente el filtro de departamento si existe
-                                if (filterDepartment) {
-                                    // Obtener el nombre del departamento seleccionado
-                                    const departmentSelect = document.getElementById('filter-payment-department-select');
-                                    const departmentName = departmentSelect ?
-                                        departmentSelect.options[departmentSelect.selectedIndex].text : 'التخصص المحدد';
-
-                                    filteredStudents = filteredStudents.filter(student => {
-                                        const studentDeptId = student.department_id ? String(student.department_id) : '';
-                                        const filterDeptId = String(filterDepartment);
-
-                                        // Intentar diferentes formatos de comparación
-                                        const coincideExacto = studentDeptId === filterDeptId;
-                                        const coincideNumerico = parseInt(studentDeptId) === parseInt(filterDeptId);
-
-                                        // Verificar también por nombre de departamento si está disponible
-                                        const coincidePorNombre = student.department_name &&
-                                            departmentName &&
-                                            student.department_name.trim() === departmentName.trim();
-
-                                        return coincideExacto || coincideNumerico || coincidePorNombre;
-                                    });
+                                // Personalizar el mensaje de "no hay resultados"
+                                const noResultsMessage = document.getElementById('no-results-message');
+                                if (noResultsMessage) {
+                                    noResultsMessage.textContent = `لا توجد بيانات متاحة للفصل الدراسي "${filterSemester}".`;
                                 }
-
-                                // No mostramos alerta al usuario para mejorar la experiencia
-                                console.log('Filtro de semestre sin resultados, mostrando todos los estudiantes sin alerta');
                             }
                         }
 
@@ -545,89 +500,49 @@
                             console.log('Filtrando por grupo de estudiante:', filterGroup);
                             console.log('Estudiantes antes del filtro de grupo:', filteredStudents.length);
 
-                            // Recopilar grupos disponibles en las inscripciones y mostrar información detallada
+                            // Mostrar información de grupos disponibles
                             const gruposDisponibles = new Set();
-                            const gruposInfo = [];
-
                             filteredStudents.forEach(student => {
-                                if (student.enrollments && student.enrollments.length > 0) {
-                                    student.enrollments.forEach(enrollment => {
-                                        if (enrollment.group_name) {
-                                            gruposDisponibles.add(enrollment.group_name);
-                                            gruposInfo.push({
-                                                studentName: student.name,
-                                                studentId: student.id,
-                                                enrollmentId: enrollment.enrollment_id,
-                                                groupName: enrollment.group_name,
-                                                groupId: enrollment.group_id,
-                                                courseName: enrollment.course_name
-                                            });
-                                        }
-                                    });
+                                if (student.group_name) {
+                                    gruposDisponibles.add(student.group_name);
                                 }
                             });
+                            console.log('Grupos disponibles en los datos:', Array.from(gruposDisponibles));
 
-                            console.log('Grupos disponibles en las inscripciones:', Array.from(gruposDisponibles));
-                            console.log('Información detallada de grupos:', gruposInfo);
+                            // Implementamos un filtro para el grupo considerando SOLO el grupo del estudiante
+                            // y NO los grupos de sus inscripciones
+                            filteredStudents = filteredStudents.filter(student => {
+                                // Verificar coincidencia exacta con el grupo del estudiante
+                                const coincideExacto = student.group_name === filterGroup;
 
-                            // Crear una copia de los estudiantes originales para el filtrado
-                            const estudiantesFiltrados = [];
+                                // Verificar coincidencia ignorando mayúsculas/minúsculas
+                                const coincideInsensible = student.group_name &&
+                                    filterGroup &&
+                                    student.group_name.toLowerCase() === filterGroup.toLowerCase();
 
-                            // Verificar si hay grupos disponibles
-                            if (gruposDisponibles.size > 0) {
-                                // Iterar sobre cada estudiante y verificar sus inscripciones
-                                filteredStudents.forEach(student => {
-                                    // Verificar si el estudiante tiene inscripciones
-                                    if (student.enrollments && student.enrollments.length > 0) {
-                                        // Crear una copia del estudiante para modificar sus inscripciones
-                                        const studentCopy = JSON.parse(JSON.stringify(student));
+                                // Verificar coincidencia parcial (contiene)
+                                const coincideParcial = student.group_name &&
+                                    filterGroup &&
+                                    student.group_name.includes(filterGroup);
 
-                                        // Filtrar solo las inscripciones que coinciden con el grupo seleccionado
-                                        const enrollmentsInGroup = student.enrollments.filter(enrollment =>
-                                            enrollment.group_name === filterGroup
-                                        );
+                                const coincide = coincideExacto || coincideInsensible || coincideParcial;
 
-                                        // Si el estudiante tiene inscripciones en el grupo seleccionado
-                                        if (enrollmentsInGroup.length > 0) {
-                                            console.log(`Estudiante ${student.name}: Tiene ${enrollmentsInGroup.length} inscripciones en grupo ${filterGroup}`);
-
-                                            // Actualizar las inscripciones del estudiante para mostrar solo las del grupo seleccionado
-                                            studentCopy.enrollments = enrollmentsInGroup;
-
-                                            // Añadir el estudiante a la lista filtrada
-                                            estudiantesFiltrados.push(studentCopy);
-                                        } else {
-                                            console.log(`Estudiante ${student.name}: No tiene inscripciones en grupo ${filterGroup}`);
-                                        }
-                                    }
-                                });
-
-                                console.log(`Encontrados ${estudiantesFiltrados.length} estudiantes con inscripciones en grupo ${filterGroup}`);
-
-                                // Actualizar la lista de estudiantes filtrados
-                                filteredStudents = estudiantesFiltrados;
-
-                                // Si no hay resultados después del filtro, mostramos un mensaje
-                                if (filteredStudents.length === 0) {
-                                    console.warn('No se encontraron estudiantes para el grupo:', filterGroup);
-
-                                    // Personalizar el mensaje de "no hay resultados"
-                                    const noResultsMessage = document.getElementById('no-results-message');
-                                    if (noResultsMessage) {
-                                        noResultsMessage.textContent = `لا توجد بيانات متاحة للمجموعة "${filterGroup}".`;
-                                    }
+                                if (coincide) {
+                                    console.log(`Estudiante ${student.name}, grupo: ${student.group_name}, coincide: ${coincide}`);
                                 }
-                            } else {
-                                console.log('No hay grupos disponibles en las inscripciones, desactivando filtro de grupo temporalmente');
+
+                                return coincide;
+                            });
+
+                            // Si no hay resultados después del filtro, mostramos un mensaje
+                            if (filteredStudents.length === 0) {
+                                console.warn('No se encontraron estudiantes para el grupo:', filterGroup);
 
                                 // Personalizar el mensaje de "no hay resultados"
                                 const noResultsMessage = document.getElementById('no-results-message');
                                 if (noResultsMessage) {
-                                    noResultsMessage.textContent = `لا توجد بيانات متاحة للمجموعات.`;
+                                    noResultsMessage.textContent = `لا توجد بيانات متاحة للمجموعة "${filterGroup}".`;
                                 }
-
-                                // Vaciar la lista de estudiantes para mostrar "no hay resultados"
-                                filteredStudents = [];
                             }
 
                             console.log('Estudiantes después del filtro de grupo:', filteredStudents.length);
@@ -642,51 +557,19 @@
                             filteredStudents = filteredStudents.filter(student => {
                                 // Si el estudiante no tiene inscripciones, no coincide con ningún filtro de pago
                                 if (!student.enrollments || student.enrollments.length === 0) {
-                                    console.log(`Estudiante ${student.name || student.id}: Sin inscripciones, excluido del filtro de pago`);
                                     return false;
                                 }
 
-                                // Usar el resumen de estado de pago si está disponible
-                                if (student.payment_status_summary) {
-                                    if (filterPaymentStatus === 'خالص') {
-                                        // Para "خالص" (pagado), todas las inscripciones deben estar pagadas
-                                        console.log(`Estudiante ${student.name}: Usando resumen - Todas pagadas? ${student.payment_status_summary.all_paid}`);
-                                        return student.payment_status_summary.all_paid;
-                                    } else if (filterPaymentStatus === 'غير خالص') {
-                                        // Para "غير خالص" (no pagado), al menos una inscripción debe estar sin pagar
-                                        console.log(`Estudiante ${student.name}: Usando resumen - Alguna sin pagar? ${student.payment_status_summary.any_unpaid}`);
-                                        return student.payment_status_summary.any_unpaid;
-                                    }
-                                } else {
-                                    // Si no hay resumen, calcular manualmente
-                                    console.log(`Estudiante ${student.name}: Sin resumen, calculando estado de pago manualmente`);
-
-                                    // Normalizar los estados de pago para cada inscripción
-                                    const normalizedEnrollments = student.enrollments.map(enrollment => {
-                                        // Asegurarse de que payment_status tenga un valor válido
-                                        const status = enrollment.payment_status || 'غير خالص';
-                                        // Normalizar el estado a un formato estándar
-                                        return {
-                                            ...enrollment,
-                                            normalized_status: (status === 'paid' || status === 'خالص') ? 'خالص' : 'غير خالص'
-                                        };
-                                    });
-
-                                    if (filterPaymentStatus === 'خالص') {
-                                        // Para "خالص" (pagado), todas las inscripciones deben estar pagadas
-                                        const allPaid = normalizedEnrollments.every(enrollment =>
-                                            enrollment.normalized_status === 'خالص'
-                                        );
-                                        console.log(`Estudiante ${student.name}: Todas pagadas? ${allPaid}`);
-                                        return allPaid;
-                                    } else if (filterPaymentStatus === 'غير خالص') {
-                                        // Para "غير خالص" (no pagado), al menos una inscripción debe estar sin pagar
-                                        const anyUnpaid = normalizedEnrollments.some(enrollment =>
-                                            enrollment.normalized_status === 'غير خالص'
-                                        );
-                                        console.log(`Estudiante ${student.name}: Alguna sin pagar? ${anyUnpaid}`);
-                                        return anyUnpaid;
-                                    }
+                                if (filterPaymentStatus === 'خالص') {
+                                    // Para "خالص" (pagado), todas las inscripciones deben estar pagadas
+                                    return student.enrollments.every(enrollment =>
+                                        enrollment.payment_status === 'paid' || enrollment.payment_status === 'خالص'
+                                    );
+                                } else if (filterPaymentStatus === 'غير خالص') {
+                                    // Para "غير خالص" (no pagado), al menos una inscripción debe estar sin pagar
+                                    return student.enrollments.some(enrollment =>
+                                        enrollment.payment_status === 'unpaid' || enrollment.payment_status === 'غير خالص'
+                                    );
                                 }
 
                                 // Si el filtro no coincide con ninguno de los valores esperados, no filtrar
@@ -1575,7 +1458,7 @@
                         // Crear un conjunto para almacenar grupos únicos
                         const uniqueGroups = new Set();
 
-                        // Recopilar todos los grupos únicos de estudiantes
+                        // Recopilar SOLO los grupos únicos de estudiantes (no de inscripciones)
                         data.students.forEach(student => {
                             if (student.group_name && student.group_name.trim() !== '') {
                                 uniqueGroups.add(student.group_name);
@@ -1883,39 +1766,19 @@
                             filteredStudents.forEach(student => {
                                 console.log(`Estudiante: ${student.name} (ID: ${student.id})`);
                                 console.log(`  Semestre: ${student.semester}`);
-
-                                // Mostrar semestres en inscripciones si existen
-                                if (student.enrollments && student.enrollments.length > 0) {
-                                    console.log(`  Semestres en inscripciones:`);
-                                    student.enrollments.forEach((enrollment, index) => {
-                                        console.log(`    ${index + 1}. Curso: ${enrollment.course_name}, Semestre: ${enrollment.semester || 'No especificado'}`);
-                                    });
-                                }
                             });
 
-                            // Implementamos un filtro más flexible para el semestre
+                            // Implementamos un filtro para el semestre considerando SOLO el semestre del estudiante
+                            // y NO los semestres de sus inscripciones
                             const estudiantesFiltrados = filteredStudents.filter(student => {
                                 // Verificar si el estudiante tiene un semestre asignado que coincide con el filtro
-                                if (student.semester && student.semester === filterSemester) {
-                                    console.log(`  Estudiante ${student.name} coincide por semestre directo: ${student.semester}`);
-                                    return true;
+                                const coincide = student.semester && student.semester === filterSemester;
+
+                                if (coincide) {
+                                    console.log(`  Estudiante ${student.name} coincide por semestre: ${student.semester}`);
                                 }
 
-                                // Verificar semestres en inscripciones
-                                if (student.enrollments && student.enrollments.length > 0) {
-                                    const coincidePorInscripcion = student.enrollments.some(enrollment => {
-                                        return enrollment.semester === filterSemester;
-                                    });
-
-                                    if (coincidePorInscripcion) {
-                                        console.log(`  Estudiante ${student.name} coincide por semestre en inscripción`);
-                                    }
-
-                                    return coincidePorInscripcion;
-                                }
-
-                                console.log(`  Estudiante ${student.name} no coincide con el semestre ${filterSemester}`);
-                                return false;
+                                return coincide;
                             });
 
                             console.log('Informe: Estudiantes después del filtro de semestre:', estudiantesFiltrados.length);
@@ -1939,14 +1802,6 @@
                             filteredStudents.forEach(student => {
                                 console.log(`Estudiante: ${student.name} (ID: ${student.id})`);
                                 console.log(`  Grupo: ${student.group_name || 'No especificado'}, Tipo: ${typeof student.group_name}`);
-
-                                // Mostrar grupos en inscripciones si existen
-                                if (student.enrollments && student.enrollments.length > 0) {
-                                    console.log(`  Grupos en inscripciones:`);
-                                    student.enrollments.forEach((enrollment, index) => {
-                                        console.log(`    ${index + 1}. Curso: ${enrollment.course_name}, Grupo: ${enrollment.group_name || 'No especificado'}`);
-                                    });
-                                }
                             });
 
                             // Mostrar información de grupos disponibles
@@ -1955,18 +1810,11 @@
                                 if (student.group_name) {
                                     gruposDisponibles.add(student.group_name);
                                 }
-                                // También agregar grupos de inscripciones
-                                if (student.enrollments) {
-                                    student.enrollments.forEach(enrollment => {
-                                        if (enrollment.group_name) {
-                                            gruposDisponibles.add(enrollment.group_name);
-                                        }
-                                    });
-                                }
                             });
                             console.log('Informe: Grupos de estudiantes disponibles:', Array.from(gruposDisponibles));
 
-                            // Implementamos un filtro más flexible para el grupo
+                            // Implementamos un filtro para el grupo considerando SOLO el grupo del estudiante
+                            // y NO los grupos de sus inscripciones
                             const estudiantesFiltrados = filteredStudents.filter(student => {
                                 // Verificar coincidencia exacta
                                 const coincideExacto = student.group_name === filterGroup;
@@ -1981,18 +1829,11 @@
                                     filterGroup &&
                                     student.group_name.includes(filterGroup);
 
-                                // Verificar grupos en inscripciones
-                                let coincidePorInscripcion = false;
-                                if (student.enrollments && student.enrollments.length > 0) {
-                                    coincidePorInscripcion = student.enrollments.some(enrollment => {
-                                        return enrollment.group_name === filterGroup;
-                                    });
+                                const coincide = coincideExacto || coincideInsensible || coincideParcial;
+
+                                if (coincide) {
+                                    console.log(`Estudiante ${student.name}, grupo: ${student.group_name}, coincide: ${coincide}`);
                                 }
-
-                                const coincide = coincideExacto || coincideInsensible || coincideParcial || coincidePorInscripcion;
-
-                                console.log(`Estudiante ${student.name}, grupo: ${student.group_name}, coincide: ${coincide}`);
-                                console.log(`  Exacto: ${coincideExacto}, Insensible: ${coincideInsensible}, Parcial: ${coincideParcial}, Por inscripción: ${coincidePorInscripcion}`);
 
                                 return coincide;
                             });

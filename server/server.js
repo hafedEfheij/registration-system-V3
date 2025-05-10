@@ -1796,47 +1796,34 @@ app.put('/api/admin/enrollments/:id/payment-status', financialSupervisorMiddlewa
   const enrollmentId = req.params.id;
   const { payment_status } = req.body;
 
-  console.log(`Actualizando estado de pago para inscripción ID: ${enrollmentId} a: ${payment_status}`);
-
   // Validate input
   if (!payment_status || (payment_status !== 'خالص' && payment_status !== 'غير خالص')) {
-    console.error(`Estado de pago inválido: ${payment_status}`);
     return res.status(400).json({ error: 'حالة الدفع غير صالحة. يجب أن تكون "خالص" أو "غير خالص"' });
   }
 
   // Check if enrollment exists
   db.get('SELECT * FROM enrollments WHERE id = ?', [enrollmentId], (err, enrollment) => {
     if (err) {
-      console.error(`Error al buscar inscripción: ${err.message}`);
       return res.status(500).json({ error: err.message });
     }
 
     if (!enrollment) {
-      console.error(`Inscripción no encontrada con ID: ${enrollmentId}`);
       return res.status(404).json({ error: 'التسجيل غير موجود' });
     }
 
-    console.log(`Inscripción encontrada: ${JSON.stringify(enrollment)}`);
-
-    // Normalizar el estado de pago para asegurar consistencia
-    const normalizedStatus = payment_status;
-
     // Update payment status
     db.run('UPDATE enrollments SET payment_status = ? WHERE id = ?',
-      [normalizedStatus, enrollmentId],
+      [payment_status, enrollmentId],
       function(err) {
         if (err) {
-          console.error(`Error al actualizar estado de pago: ${err.message}`);
           return res.status(500).json({ error: err.message });
         }
 
-        console.log(`Estado de pago actualizado exitosamente a: ${normalizedStatus}`);
-
         res.json({
           success: true,
-          message: `تم تحديث حالة الدفع إلى "${normalizedStatus}" بنجاح`,
+          message: `تم تحديث حالة الدفع إلى "${payment_status}" بنجاح`,
           enrollment_id: enrollmentId,
-          payment_status: normalizedStatus
+          payment_status: payment_status
         });
       }
     );
@@ -1899,45 +1886,14 @@ app.get('/api/admin/students-enrollments', financialSupervisorMiddleware, (req, 
           // Imprimir información de las inscripciones para depuración
           if (enrollments && enrollments.length > 0) {
             console.log(`Estudiante ${student.id} tiene ${enrollments.length} inscripciones`);
-
-            // Normalizar los estados de pago para asegurar consistencia
-            enrollments = enrollments.map(enrollment => {
-              // Asegurarse de que payment_status tenga un valor válido
-              if (!enrollment.payment_status) {
-                enrollment.payment_status = 'غير خالص';
-              } else if (enrollment.payment_status === 'paid') {
-                enrollment.payment_status = 'خالص';
-              } else if (enrollment.payment_status === 'unpaid') {
-                enrollment.payment_status = 'غير خالص';
-              }
-
-              return enrollment;
-            });
-
-            console.log(`Primera inscripción (normalizada): ${JSON.stringify(enrollments[0])}`);
+            console.log(`Primera inscripción: ${JSON.stringify(enrollments[0])}`);
           } else {
             console.log(`Estudiante ${student.id} no tiene inscripciones`);
           }
-
           if (err) {
             reject(err);
           } else {
             student.enrollments = enrollments;
-
-            // Añadir información de estado de pago general para facilitar el filtrado
-            if (enrollments && enrollments.length > 0) {
-              const allPaid = enrollments.every(e => e.payment_status === 'خالص');
-              const anyUnpaid = enrollments.some(e => e.payment_status === 'غير خالص');
-
-              student.payment_status_summary = {
-                all_paid: allPaid,
-                any_unpaid: anyUnpaid,
-                status: allPaid ? 'خالص' : 'غير خالص'
-              };
-
-              console.log(`Estado de pago general para ${student.name}: ${student.payment_status_summary.status}`);
-            }
-
             resolve(student);
           }
         });
