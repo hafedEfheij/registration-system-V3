@@ -545,21 +545,31 @@
                             console.log('Filtrando por grupo de estudiante:', filterGroup);
                             console.log('Estudiantes antes del filtro de grupo:', filteredStudents.length);
 
-                            // Mostrar información de grupos disponibles
+                            // Recopilar grupos disponibles en las inscripciones
                             const gruposDisponibles = new Set();
                             filteredStudents.forEach(student => {
-                                if (student.group_name) {
-                                    gruposDisponibles.add(student.group_name);
+                                if (student.enrollments && student.enrollments.length > 0) {
+                                    student.enrollments.forEach(enrollment => {
+                                        if (enrollment.group_name) {
+                                            gruposDisponibles.add(enrollment.group_name);
+                                        }
+                                    });
                                 }
                             });
-                            console.log('Grupos de estudiantes disponibles en los datos:', Array.from(gruposDisponibles));
+                            console.log('Grupos disponibles en las inscripciones:', Array.from(gruposDisponibles));
 
                             // Verificar si hay grupos disponibles
                             if (gruposDisponibles.size > 0) {
                                 filteredStudents = filteredStudents.filter(student => {
-                                    // Verificar si el grupo del estudiante coincide con el filtro
-                                    console.log('Comparando grupo del estudiante:', student.group_name, 'con filtro:', filterGroup);
-                                    return student.group_name === filterGroup;
+                                    // Verificar si alguna inscripción del estudiante tiene el grupo buscado
+                                    if (student.enrollments && student.enrollments.length > 0) {
+                                        const tieneGrupo = student.enrollments.some(enrollment =>
+                                            enrollment.group_name === filterGroup
+                                        );
+                                        console.log(`Estudiante ${student.name}: ¿Tiene grupo ${filterGroup}? ${tieneGrupo}`);
+                                        return tieneGrupo;
+                                    }
+                                    return false;
                                 });
 
                                 // Si no hay resultados después del filtro, mostramos un mensaje
@@ -616,7 +626,7 @@
                                     console.log('Filtro de grupo sin resultados, mostrando todos los estudiantes sin alerta');
                                 }
                             } else {
-                                console.log('No hay grupos disponibles en los datos, desactivando filtro de grupo temporalmente');
+                                console.log('No hay grupos disponibles en las inscripciones, desactivando filtro de grupo temporalmente');
 
                                 // No mostramos alerta al usuario para mejorar la experiencia
                                 console.log('No hay grupos disponibles, ignorando filtro de grupo sin mostrar alerta');
