@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة حالة الدفع - جامعة الحاضرة</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .payment-status-badge {
+            font-size: 0.9rem;
+            padding: 0.3rem 0.6rem;
+        }
+        .student-card {
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .student-card .card-header {
+            border-radius: 10px 10px 0 0;
+        }
+        .course-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+        .course-item:last-child {
+            border-bottom: none;
+        }
+        .payment-toggle-btn {
+            min-width: 100px;
+        }
+        .search-container {
+            margin-bottom: 1.5rem;
+        }
+        .student-info {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .no-courses-message {
+            padding: 1rem;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <img src="../images/images.jpg" alt="شعار الجامعة" class="img-fluid mb-3" style="max-height: 80px;">
+                        <h5 class="text-white">جامعة الحاضرة</h5>
+                        <p class="text-white fw-bold" id="user-role-title">لوحة تحكم المشرف</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <!-- Enlaces visibles solo para administradores -->
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fas fa-tachometer-alt"></i>
+                                لوحة التحكم
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="students.html">
+                                <i class="fas fa-user-graduate"></i>
+                                إدارة الطلبة
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="departments.html">
+                                <i class="fas fa-building"></i>
+                                إدارة التخصصات
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="courses.html">
+                                <i class="fas fa-book"></i>
+                                إدارة المواد
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="course-statistics.html">
+                                <i class="fas fa-chart-bar"></i>
+                                إحصائيات المواد
+                            </a>
+                        </li>
+                        <!-- Enlace visible para administradores y supervisores financieros -->
+                        <li class="nav-item admin-only financial-only">
+                            <a class="nav-link active" href="payment-management.html">
+                                <i class="fas fa-money-bill-wave"></i>
+                                إدارة حالة الدفع
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="profile.html">
+                                <i class="fas fa-user-cog"></i>
+                                إعدادات الحساب
+                            </a>
+                        </li>
+                        <li class="nav-item mt-5">
+                            <a class="nav-link text-danger" href="#" id="sidebar-logout-button">
+                                <i class="fas fa-sign-out-alt"></i>
+                                تسجيل الخروج
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">إدارة حالة الدفع</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i>
+                                <span id="user-name">المشرف</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="profile.html">إعدادات الحساب</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logout-button">تسجيل الخروج</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="row search-container">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" id="search-input" placeholder="ابحث عن طالب (الاسم أو رقم القيد)">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-end">
+                            <button id="show-filtered-payment-report" class="btn btn-success">
+                                <i class="fas fa-file-alt"></i> تقرير حسب التصنيف
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div class="row mt-3 mb-3">
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-university"></i>
+                            </span>
+                            <select class="form-select" id="filter-payment-department-select">
+                                <option value="">جميع التخصصات</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-layer-group"></i>
+                            </span>
+                            <select class="form-select" id="filter-payment-semester-select">
+                                <option value="">جميع الفصول الدراسية</option>
+                                <option value="الأول">الفصل الأول</option>
+                                <option value="الثاني">الفصل الثاني</option>
+                                <option value="الثالث">الفصل الثالث</option>
+                                <option value="الرابع">الفصل الرابع</option>
+                                <option value="الخامس">الفصل الخامس</option>
+                                <option value="السادس">الفصل السادس</option>
+                                <option value="السابع">الفصل السابع</option>
+                                <option value="الثامن">الفصل الثامن</option>
+                                <option value="التاسع">الفصل التاسع</option>
+                                <option value="العاشر">الفصل العاشر</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            <select class="form-select" id="filter-payment-group-select">
+                                <option value="">جميع المجموعات</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </span>
+                            <select class="form-select" id="filter-payment-status-select">
+                                <option value="">جميع حالات الدفع</option>
+                                <option value="خالص">خالص</option>
+                                <option value="غير خالص">غير خالص</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-secondary w-100" id="reset-payment-filters">
+                            <i class="fas fa-sync"></i> إعادة تعيين
+                        </button>
+                    </div>
+                    <div class="col-md-9">
+                        <div id="current-payment-filters" class="alert alert-info d-none">
+                            <i class="fas fa-filter"></i> <span id="current-payment-filter-text">عرض جميع الطلبة</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loading-indicator" class="text-center my-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">جاري التحميل...</span>
+                    </div>
+                    <p class="mt-2">جاري تحميل بيانات الطلبة والمواد...</p>
+                </div>
+
+                <!-- Error Message -->
+                <div id="error-message" class="alert alert-danger my-3 d-none" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="error-text">حدث خطأ أثناء تحميل البيانات</span>
+                </div>
+
+                <!-- Students List -->
+                <div id="students-container" class="d-none">
+                    <!-- Students will be loaded here -->
+                </div>
+
+                <!-- No Results Message -->
+                <div id="no-results" class="alert alert-info my-3 d-none" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span id="no-results-message">لا توجد نتائج مطابقة لبحثك</span>
+                    <div class="mt-2">
+                        <small>يمكنك تجربة:</small>
+                        <ul class="mb-0 mt-1">
+                            <li><small>تغيير معايير البحث أو الفلترة</small></li>
+                            <li><small>إعادة تعيين الفلاتر بالضغط على زر "إعادة تعيين"</small></li>
+                            <li><small>التأكد من وجود طلاب مسجلين في النظام</small></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtered Payment Report Modal -->
+    <div class="modal fade" id="filteredPaymentReportModal" tabindex="-1" aria-labelledby="filteredPaymentReportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="filteredPaymentReportModalLabel">تقرير حالة الدفع حسب التصنيف</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="filtered-payment-report-loading" class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">جاري التحميل...</span>
+                        </div>
+                        <p>جاري تحميل بيانات التقرير...</p>
+                    </div>
+                    <div id="filtered-payment-report-error" class="alert alert-danger d-none" role="alert">
+                        حدث خطأ أثناء تحميل بيانات التقرير
+                    </div>
+                    <div id="filtered-payment-report-content" class="d-none">
+                        <!-- تقرير الدفع حسب التصنيف سيتم تحميله هنا -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="print-filtered-payment-report">
+                        <i class="fas fa-print"></i> طباعة التقرير
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Responsive JS -->
+    <script src="../js/responsive.js"></script>
+    <!-- Modal Fixes JS -->
+    <script src="../js/modal-fixes.js"></script>
+    <script src="../js/main.js"></script>
+    <!-- Auto Logout JS -->
+    <script src="../js/auto-logout.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const searchInput = document.getElementById('search-input');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const errorMessage = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const studentsContainer = document.getElementById('students-container');
+            const noResults = document.getElementById('no-results');
+
+            // Actualizar el título según el rol del usuario
+            fetch('/api/user')
+                .then(response => response.json())
+                .then(data => {
+                    const userRoleTitle = document.getElementById('user-role-title');
+                    if (userRoleTitle && data.user) {
+                        if (data.user.role === 'financial_supervisor') {
+                            userRoleTitle.textContent = 'لوحة تحكم المشرف المالي';
+                            document.title = 'إدارة حالة الدفع - المشرف المالي';
+                        } else {
+                            userRoleTitle.textContent = 'لوحة تحكم المشرف';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user info:', error);
+                });
+
+            // Variables para almacenar los filtros actuales
+            let currentPaymentFilters = {
+                department: '',
+                semester: '',
+                group: '',
+                paymentStatus: '',
+                search: ''
+            };
+
+            // Load students with their enrollments
+            function loadStudentsEnrollments(filterDepartment = '', filterSemester = '', filterGroup = '', filterPaymentStatus = '', searchTerm = '') {
+                // Show loading indicator and hide other elements
+                loadingIndicator.classList.remove('d-none');
+                studentsContainer.classList.add('d-none');
+                errorMessage.classList.add('d-none');
+                noResults.classList.add('d-none'); // Ocultar mensaje de "no hay resultados"
+
+                // Actualizar los filtros actuales
+                currentPaymentFilters = {
+                    department: filterDepartment,
+                    semester: filterSemester,
+                    group: filterGroup,
+                    paymentStatus: filterPaymentStatus,
+                    search: searchTerm
+                };
+
+                // Fetch data from API
+                fetch('/api/admin/students-enrollments')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('فشل في تحميل البيانات');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Hide loading indicator
+                        loadingIndicator.classList.add('d-none');
+
+                        // Filtrar los estudiantes según los criterios
+                        let filteredStudents = data.students;
+
+                        // Filtrar por departamento
+                        if (filterDepartment) {
+                            console.log('Filtrando por departamento:', filterDepartment, 'Tipo:', typeof filterDepartment);
+                            console.log('Estudiantes antes del filtro de departamento:', filteredStudents.length);
+
+                            // Mostrar información de departamentos disponibles
+                            const departamentosDisponibles = new Set();
+                            const departamentosInfo = [];
+
+                            filteredStudents.forEach(student => {
+                                if (student.department_id) {
+                                    const deptId = String(student.department_id);
+                                    departamentosDisponibles.add(deptId);
+                                    departamentosInfo.push({
+                                        studentName: student.name,
+                                        deptId: deptId,
+                                        deptIdType: typeof student.department_id,
+                                        deptName: student.department_name
+                                    });
+                                }
+                            });
+
+                            console.log('Departamentos disponibles en los datos:', Array.from(departamentosDisponibles));
+                            console.log('Información detallada de departamentos:', departamentosInfo);
+
+                            // Asegurarse de que la comparación sea consistente (string vs string)
+                            const filterDeptId = String(filterDepartment);
+                            console.log('ID de departamento del filtro (convertido a string):', filterDeptId);
+
+                            // Obtener el nombre del departamento seleccionado para mostrar en el mensaje
+                            const departmentSelect = document.getElementById('filter-payment-department-select');
+                            const departmentName = departmentSelect ?
+                                departmentSelect.options[departmentSelect.selectedIndex].text : 'التخصص المحدد';
+                            console.log('Nombre del departamento seleccionado:', departmentName);
+
+                            const estudiantesFiltrados = filteredStudents.filter(student => {
+                                // Convertir ambos valores a string para comparación consistente
+                                const studentDeptId = student.department_id ? String(student.department_id) : '';
+
+                                // Intentar diferentes formatos de comparación
+                                const coincideExacto = studentDeptId === filterDeptId;
+                                const coincideNumerico = parseInt(studentDeptId) === parseInt(filterDeptId);
+
+                                // Verificar también por nombre de departamento si está disponible
+                                const coincidePorNombre = student.department_name &&
+                                    departmentName &&
+                                    student.department_name.trim() === departmentName.trim();
+
+                                const coincide = coincideExacto || coincideNumerico || coincidePorNombre;
+
+                                console.log(`Estudiante: ${student.name}, Dept ID: ${studentDeptId} (${typeof student.department_id}), Dept Name: ${student.department_name}`);
+                                console.log(`  con Filtro ID: ${filterDeptId}, Filtro Nombre: ${departmentName}`);
+                                console.log(`  Coincide: ${coincide} (Exacto: ${coincideExacto}, Numérico: ${coincideNumerico}, Por Nombre: ${coincidePorNombre})`);
+
+                                return coincide;
+                            });
+
+                            console.log('Estudiantes después del filtro de departamento:', estudiantesFiltrados.length);
+
+                            // Si no hay resultados después del filtro, mostrar mensaje de "no hay resultados"
+                            if (estudiantesFiltrados.length === 0) {
+                                console.warn('No se encontraron estudiantes para el departamento:', filterDepartment);
+
+                                // Obtener el nombre del departamento para el log
+                                const departmentSelect = document.getElementById('filter-payment-department-select');
+                                const departmentName = departmentSelect ?
+                                    departmentSelect.options[departmentSelect.selectedIndex].text : 'المحدد';
+
+                                // No mostrar mensaje de advertencia al usuario
+                                console.log(`No hay datos para el departamento "${departmentName}". Mostrando mensaje de "no hay resultados".`);
+
+                                // Aplicar el filtro vacío para mostrar "no hay resultados"
+                                filteredStudents = [];
+
+                                // Personalizar el mensaje de "no hay resultados"
+                                const noResultsMessage = document.getElementById('no-results-message');
+                                if (noResultsMessage) {
+                                    noResultsMessage.textContent = `لا توجد بيانات متاحة للتخصص "${departmentName}".`;
+                                }
+                            } else {
+                                // Aplicar el filtro si hay resultados
+                                filteredStudents = estudiantesFiltrados;
+                            }
+                        }
+
+                        // Filtrar por semestre
+                        if (filterSemester) {
+                            console.log('Filtrando por semestre:', filterSemester);
+                            console.log('Estudiantes antes del filtro de semestre:', filteredStudents.length);
+
+                            // Mostrar información de semestres disponibles
+                            const semestresDisponibles = new Set();
+
+                            // Primero verificamos si el estudiante tiene un semestre asignado directamente
+                            filteredStudents.forEach(student => {
+                                if (student.semester) {
+                                    semestresDisponibles.add(student.semester);
+                                }
+                            });
+
+                            // Luego verificamos los semestres en las inscripciones
+                            filteredStudents.forEach(student => {
+                                if (student.enrollments && student.enrollments.length > 0) {
+                                    student.enrollments.forEach(enrollment => {
+                                        if (enrollment.semester) {
+                                            semestresDisponibles.add(enrollment.semester);
+                                        }
+                                    });
+                                }
+                            });
+
+                            console.log('Semestres disponibles en los datos:', Array.from(semestresDisponibles));
+
+                            // Implementamos el filtro por semestre considerando tanto el semestre del estudiante
+                            // como los semestres de sus inscripciones
+                            filteredStudents = filteredStudents.filter(student => {
+                                // Verificar si el estudiante tiene un semestre asignado que coincide con el filtro
+                                if (student.semester && student.semester === filterSemester) {
+                                    return true;
+                                }
+
+                                // Si el estudiante no tiene inscripciones, verificamos solo su semestre
+                                if (!student.enrollments || student.enrollments.length === 0) {
+                                    return student.semester === filterSemester;
+                                }
+
+                                // Verificar si alguna inscripción coincide con el semestre
+                                const coincide = student.enrollments.some(enrollment => {
+                                    return enrollment.semester === filterSemester;
+                                });
+
+                                return coincide;
+                            });
+
+                            console.log('Estudiantes después del filtro de semestre:', filteredStudents.length);
+
+                            // Si no hay resultados después del filtro, mostramos todos los estudiantes
+                            // pero sin mostrar un mensaje de advertencia
+                            if (filteredStudents.length === 0) {
+                                console.warn('No se encontraron estudiantes para el semestre:', filterSemester);
+                                console.warn('Mostrando todos los estudiantes...');
+
+                                // Recuperamos todos los estudiantes nuevamente
+                                filteredStudents = data.students;
+
+                                // Aplicamos nuevamente el filtro de departamento si existe
+                                if (filterDepartment) {
+                                    // Obtener el nombre del departamento seleccionado
+                                    const departmentSelect = document.getElementById('filter-payment-department-select');
+                                    const departmentName = departmentSelect ?
+                                        departmentSelect.options[departmentSelect.selectedIndex].text : 'التخصص المحدد';
+
+                                    filteredStudents = filteredStudents.filter(student => {
+                                        const studentDeptId = student.department_id ? String(student.department_id) : '';
+                                        const filterDeptId = String(filterDepartment);
+
+                                        // Intentar diferentes formatos de comparación
+                                        const coincideExacto = studentDeptId === filterDeptId;
+                                        const coincideNumerico = parseInt(studentDeptId) === parseInt(filterDeptId);
+
+                                        // Verificar también por nombre de departamento si está disponible
+                                        const coincidePorNombre = student.department_name &&
+                                            departmentName &&
+                                            student.department_name.trim() === departmentName.trim();
+
+                                        return coincideExacto || coincideNumerico || coincidePorNombre;
+                                    });
+                                }
+
+                                // No mostramos alerta al usuario para mejorar la experiencia
+                                console.log('Filtro de semestre sin resultados, mostrando todos los estudiantes sin alerta');
+                            }
+                        }
+
+                        // Filtrar por grupo
+                        if (filterGroup) {
+                            console.log('Filtrando por grupo de estudiante:', filterGroup);
+                            console.log('Estudiantes antes del filtro de grupo:', filteredStudents.length);
+
+                            // Mostrar información de grupos disponibles
+                            const gruposDisponibles = new Set();
+                            filteredStudents.forEach(student => {
+                                if (student.group_name) {
+                                    gruposDisponibles.add(student.group_name);
+                                }
+                            });
+                            console.log('Grupos de estudiantes disponibles en los datos:', Array.from(gruposDisponibles));
+
+                            // Verificar si hay grupos disponibles
+                            if (gruposDisponibles.size > 0) {
+                                filteredStudents = filteredStudents.filter(student => {
+                                    // Verificar si el grupo del estudiante coincide con el filtro
+                                    console.log('Comparando grupo del estudiante:', student.group_name, 'con filtro:', filterGroup);
+                                    return student.group_name === filterGroup;
+                                });
+
+                                // Si no hay resultados después del filtro, mostramos un mensaje
+                                if (filteredStudents.length === 0) {
+                                    console.warn('No se encontraron estudiantes para el grupo:', filterGroup);
+                                    console.warn('Mostrando todos los estudiantes...');
+
+                                    // Recuperamos todos los estudiantes nuevamente
+                                    filteredStudents = data.students;
+
+                                    // Aplicamos nuevamente los filtros anteriores si existen
+                                    if (filterDepartment) {
+                                        // Obtener el nombre del departamento seleccionado
+                                        const departmentSelect = document.getElementById('filter-payment-department-select');
+                                        const departmentName = departmentSelect ?
+                                            departmentSelect.options[departmentSelect.selectedIndex].text : 'التخصص المحدد';
+
+                                        filteredStudents = filteredStudents.filter(student => {
+                                            const studentDeptId = student.department_id ? String(student.department_id) : '';
+                                            const filterDeptId = String(filterDepartment);
+
+                                            // Intentar diferentes formatos de comparación
+                                            const coincideExacto = studentDeptId === filterDeptId;
+                                            const coincideNumerico = parseInt(studentDeptId) === parseInt(filterDeptId);
+
+                                            // Verificar también por nombre de departamento si está disponible
+                                            const coincidePorNombre = student.department_name &&
+                                                departmentName &&
+                                                student.department_name.trim() === departmentName.trim();
+
+                                            return coincideExacto || coincideNumerico || coincidePorNombre;
+                                        });
+                                    }
+
+                                    if (filterSemester) {
+                                        filteredStudents = filteredStudents.filter(student => {
+                                            // Verificar semestre del estudiante
+                                            if (student.semester && student.semester === filterSemester) {
+                                                return true;
+                                            }
+
+                                            // Verificar semestres en inscripciones
+                                            if (student.enrollments && student.enrollments.length > 0) {
+                                                return student.enrollments.some(enrollment =>
+                                                    enrollment.semester === filterSemester
+                                                );
+                                            }
+
+                                            return false;
+                                        });
+                                    }
+
+                                    // No mostramos alerta al usuario para mejorar la experiencia
+                                    console.log('Filtro de grupo sin resultados, mostrando todos los estudiantes sin alerta');
+                                }
+                            } else {
+                                console.log('No hay grupos disponibles en los datos, desactivando filtro de grupo temporalmente');
+
+                                // No mostramos alerta al usuario para mejorar la experiencia
+                                console.log('No hay grupos disponibles, ignorando filtro de grupo sin mostrar alerta');
+                            }
+
+                            console.log('Estudiantes después del filtro de grupo:', filteredStudents.length);
+                        }
+
+                        // Filtrar por estado de pago
+                        if (filterPaymentStatus) {
+                            console.log('Filtrando por estado de pago:', filterPaymentStatus);
+                            console.log('Estudiantes antes del filtro de estado de pago:', filteredStudents.length);
+
+                            // Filtrar estudiantes según el estado de pago de sus inscripciones
+                            filteredStudents = filteredStudents.filter(student => {
+                                // Si el estudiante no tiene inscripciones, no coincide con ningún filtro de pago
+                                if (!student.enrollments || student.enrollments.length === 0) {
+                                    return false;
+                                }
+
+                                if (filterPaymentStatus === 'خالص') {
+                                    // Para "خالص" (pagado), todas las inscripciones deben estar pagadas
+                                    return student.enrollments.every(enrollment =>
+                                        enrollment.payment_status === 'paid' || enrollment.payment_status === 'خالص'
+                                    );
+                                } else if (filterPaymentStatus === 'غير خالص') {
+                                    // Para "غير خالص" (no pagado), al menos una inscripción debe estar sin pagar
+                                    return student.enrollments.some(enrollment =>
+                                        enrollment.payment_status === 'unpaid' || enrollment.payment_status === 'غير خالص'
+                                    );
+                                }
+
+                                // Si el filtro no coincide con ninguno de los valores esperados, no filtrar
+                                return true;
+                            });
+
+                            console.log('Estudiantes después del filtro de estado de pago:', filteredStudents.length);
+                        }
+
+                        // Filtrar por término de búsqueda
+                        if (searchTerm) {
+                            const searchLower = searchTerm.toLowerCase();
+                            filteredStudents = filteredStudents.filter(student =>
+                                student.name.toLowerCase().includes(searchLower) ||
+                                student.student_id.toLowerCase().includes(searchLower)
+                            );
+
+                            console.log('Estudiantes después del filtro de búsqueda:', filteredStudents.length);
+                        }
+
+                        // Actualizar la visualización de filtros actuales
+                        updateCurrentFiltersDisplay(filterDepartment, filterSemester, filterGroup, filterPaymentStatus, searchTerm);
+
+                        // Verificar si hay resultados después de aplicar todos los filtros
+                        if (filteredStudents.length === 0) {
+                            console.log('No hay resultados después de aplicar todos los filtros');
+
+                            // Personalizar el mensaje de "no hay resultados" según los filtros aplicados
+                            const noResultsMessage = document.getElementById('no-results-message');
+                            if (noResultsMessage) {
+                                let message = 'لا توجد نتائج مطابقة ';
+
+                                if (searchTerm) {
+                                    message += `للبحث عن "${searchTerm}" `;
+                                }
+
+                                if (filterDepartment || filterSemester || filterGroup) {
+                                    message += 'مع الفلاتر المحددة: ';
+
+                                    if (filterDepartment) {
+                                        const departmentSelect = document.getElementById('filter-payment-department-select');
+                                        const departmentName = departmentSelect ?
+                                            departmentSelect.options[departmentSelect.selectedIndex].text : 'التخصص المحدد';
+                                        message += `(${departmentName}) `;
+                                    }
+
+                                    if (filterSemester) {
+                                        const semesterSelect = document.getElementById('filter-payment-semester-select');
+                                        const semesterName = semesterSelect ?
+                                            semesterSelect.options[semesterSelect.selectedIndex].text : 'الفصل المحدد';
+                                        message += `(${semesterName}) `;
+                                    }
+
+                                    if (filterGroup) {
+                                        message += `(مجموعة ${filterGroup}) `;
+                                    }
+                                }
+
+                                noResultsMessage.textContent = message;
+                            }
+
+                            // Mostrar mensaje de "no hay resultados"
+                            loadingIndicator.classList.add('d-none');
+                            studentsContainer.classList.add('d-none');
+                            noResults.classList.remove('d-none');
+                        } else {
+                            // Process and display data
+                            displayStudents(filteredStudents);
+                        }
+                    })
+                    .catch(error => {
+                        // Hide loading indicator and show error
+                        loadingIndicator.classList.add('d-none');
+                        errorText.textContent = error.message;
+                        errorMessage.classList.remove('d-none');
+                    });
+            }
+
+            // Actualizar la visualización de filtros actuales
+            function updateCurrentFiltersDisplay(filterDepartment, filterSemester, filterGroup, filterPaymentStatus, searchTerm) {
+                const currentFilters = document.getElementById('current-payment-filters');
+                const currentFilterText = document.getElementById('current-payment-filter-text');
+
+                if (!currentFilters || !currentFilterText) return;
+
+                // Construir la descripción del filtro
+                let filterDescription = 'عرض';
+                let hasFilters = false;
+
+                if (filterDepartment) {
+                    const departmentSelect = document.getElementById('filter-payment-department-select');
+                    const departmentName = departmentSelect ?
+                        departmentSelect.options[departmentSelect.selectedIndex].text : 'التخصص المحدد';
+
+                    filterDescription += ` طلبة تخصص ${departmentName}`;
+                    hasFilters = true;
+
+                    // Resaltar el selector de departamento
+                    if (departmentSelect) {
+                        departmentSelect.classList.add('border-primary');
+                        const groupText = departmentSelect.parentElement.querySelector('.input-group-text');
+                        if (groupText) {
+                            groupText.classList.add('bg-primary', 'text-white');
+                            groupText.classList.remove('bg-light');
+                        }
+                    }
+                } else {
+                    // Quitar resaltado si no hay filtro de departamento
+                    const departmentSelect = document.getElementById('filter-payment-department-select');
+                    if (departmentSelect) {
+                        departmentSelect.classList.remove('border-primary');
+                        const groupText = departmentSelect.parentElement.querySelector('.input-group-text');
+                        if (groupText) {
+                            groupText.classList.remove('bg-primary', 'text-white');
+                            groupText.classList.add('bg-light');
+                        }
+                    }
+                }
+
+                if (filterSemester) {
+                    const semesterSelect = document.getElementById('filter-payment-semester-select');
+                    const semesterName = semesterSelect ?
+                        semesterSelect.options[semesterSelect.selectedIndex].text : 'الفصل المحدد';
+
+                    if (hasFilters) {
+                        filterDescription += ` في ${semesterName}`;
+                    } else {
+                        filterDescription += ` طلبة ${semesterName}`;
+                        hasFilters = true;
+                    }
+
+                    // Resaltar el selector de semestre
+                    if (semesterSelect) {
+                        semesterSelect.classList.add('border-primary');
+                        const groupText = semesterSelect.parentElement.querySelector('.input-group-text');
+                        if (groupText) {
+                            groupText.classList.add('bg-primary', 'text-white');
+                            groupText.classList.remove('bg-light');
+                        }
+                    }
+                } else {
+                    // Quitar resaltado si no hay filtro de semestre
+                    const semesterSelect = document.getElementById('filter-payment-semester-select');
+                    if (semesterSelect) {
+                        semesterSelect.classList.remove('border-primary');
+                        const groupText = semesterSelect.parentElement.querySelector('.input-group-text');
+                        if (groupText) {
+                            groupText.classList.remove('bg-primary', 'text-white');
+                            groupText.classList.add('bg-light');
+                        }
+                    }
+                }
+
+                if (filterGroup) {
+                    const groupSelect = document.getElementById('filter-payment-group-select');
+                    const groupName = groupSelect ?
+                        groupSelect.options[groupSelect.selectedIndex].text : 'المجموعة المحددة';
+
+                    if (hasFilters) {
+                        filterDescription += ` (مجموعة ${filterGroup})`;
+                    } else {
+                        filterDescription += ` طلبة مجموعة ${filterGroup}`;
+                        hasFilters = true;
+                    }
+
+                    // Resaltar el selector de grupo
+                    if (groupSelect) {
+                        groupSelect.classList.add('border-primary');
+                        const groupText = groupSelect.parentElement.querySelector('.input-group-text');
+                        if (groupText) {
+                            groupText.classList.add('bg-primary', 'text-white');
+                            groupText.classList.remove('bg-light');
+                        }
+                    }
+                } else {
+                    // Quitar resaltado si no hay filtro de grupo
+                    const groupSelect = document.getElementById('filter-payment-group-select');
+                    if (groupSelect) {
+                        groupSelect.classList.remove('border-primary');
+                        const groupText = groupSelect.parentElement.querySelector('.input-group-text');
+                        if (groupText) {
+                            groupText.classList.remove('bg-primary', 'text-white');
+                            groupText.classList.add('bg-light');
+                        }
+                    }
+                }
+
+                if (filterPaymentStatus) {
+                    const paymentStatusSelect = document.getElementById('filter-payment-status-select');
+                    const paymentStatusName = paymentStatusSelect ?
+                        paymentStatusSelect.options[paymentStatusSelect.selectedIndex].text : filterPaymentStatus;
+
+                    if (hasFilters) {
+                        filterDescription += ` (${paymentStatusName})`;
+                    } else {
+                        filterDescription += ` طلبة بحالة دفع ${paymentStatusName}`;
+                        hasFilters = true;
+                    }
+
+                    // Resaltar el selector de estado de pago
+                    if (paymentStatusSelect) {
+                        paymentStatusSelect.classList.add('border-primary');
+                        const groupText = paymentStatusSelect.parentElement.querySelector('.input-group-text');
+                        if (groupText) {
+                            groupText.classList.add('bg-primary', 'text-white');
+                            groupText.classList.remove('bg-light');
+                        }
+                    }
+                } else {
+                    // Quitar resaltado si no hay filtro de estado de pago
+                    const paymentStatusSelect = document.getElementById('filter-payment-status-select');
+                    if (paymentStatusSelect) {
+                        paymentStatusSelect.classList.remove('border-primary');
+                        const groupText = paymentStatusSelect.parentElement.querySelector('.input-group-text');
+                        if (groupText) {
+                            groupText.classList.remove('bg-primary', 'text-white');
+                            groupText.classList.add('bg-light');
+                        }
+                    }
+                }
+
+                if (searchTerm) {
+                    if (hasFilters) {
+                        filterDescription += ` (بحث: ${searchTerm})`;
+                    } else {
+                        filterDescription += ` نتائج البحث عن "${searchTerm}"`;
+                        hasFilters = true;
+                    }
+                }
+
+                if (!hasFilters) {
+                    filterDescription += ' جميع الطلبة';
+                }
+
+                // Actualizar el texto del filtro
+                currentFilterText.textContent = filterDescription;
+
+                // Mostrar u ocultar el contenedor de filtros
+                if (hasFilters) {
+                    currentFilters.classList.remove('d-none');
+                } else {
+                    currentFilters.classList.add('d-none');
+                }
+            }
+
+            // Display students and their enrollments
+            function displayStudents(students) {
+                // Clear container
+                studentsContainer.innerHTML = '';
+
+                // Check if there are students
+                if (students.length === 0) {
+                    noResults.classList.remove('d-none');
+                    studentsContainer.classList.add('d-none');
+                    return;
+                } else {
+                    // Asegurarse de que el mensaje "no hay resultados" esté oculto
+                    noResults.classList.add('d-none');
+                    studentsContainer.classList.remove('d-none');
+                }
+
+                // Create HTML for each student
+                students.forEach(student => {
+                    const studentCard = document.createElement('div');
+                    studentCard.className = 'card student-card';
+                    studentCard.dataset.studentId = student.id;
+                    studentCard.dataset.studentName = student.name;
+                    studentCard.dataset.studentRegistration = student.student_id;
+
+                    // Create card header
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'card-header bg-primary text-white';
+                    cardHeader.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">${student.name}</h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-light me-2 print-payment-report-btn" data-student-id="${student.id}">
+                                    <i class="fas fa-file-invoice-dollar me-1"></i> تقرير الدفع
+                                </button>
+                                <span class="badge bg-light text-dark">${student.student_id}</span>
+                            </div>
+                        </div>
+                        <div class="student-info mt-1">
+                            <span><i class="fas fa-id-card me-1"></i> رقم المنظومة: ${student.registration_number}</span>
+                            <span class="ms-3"><i class="fas fa-building me-1"></i> التخصص: ${student.department_name || 'غير محدد'}</span>
+                        </div>
+                    `;
+                    studentCard.appendChild(cardHeader);
+
+                    // Create card body
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body p-0';
+
+                    // Check if student has enrollments
+                    if (!student.enrollments || student.enrollments.length === 0) {
+                        cardBody.innerHTML = `
+                            <div class="no-courses-message">
+                                <i class="fas fa-info-circle me-1"></i>
+                                لم يسجل الطالب في أي مادة
+                            </div>
+                        `;
+                    } else {
+                        // Create list of courses
+                        const coursesList = document.createElement('ul');
+                        coursesList.className = 'list-group list-group-flush';
+
+                        student.enrollments.forEach(enrollment => {
+                            const courseItem = document.createElement('li');
+                            courseItem.className = 'list-group-item course-item';
+                            courseItem.dataset.enrollmentId = enrollment.enrollment_id;
+
+                            // Determine payment status and button style
+                            const isPaid = enrollment.payment_status === 'خالص';
+                            const statusBadgeClass = isPaid ? 'bg-success' : 'bg-danger';
+                            const toggleBtnClass = isPaid ? 'btn-outline-danger' : 'btn-outline-success';
+                            const toggleBtnIcon = isPaid ? 'fa-times-circle' : 'fa-check-circle';
+                            const toggleBtnText = isPaid ? 'غير خالص' : 'خالص';
+
+                            courseItem.innerHTML = `
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>${enrollment.course_name || enrollment.name || 'غير محدد'}</strong>
+                                        <small class="text-muted ms-2">(${enrollment.course_code})</small>
+                                        ${enrollment.group_name ? `<span class="badge bg-secondary ms-2">مجموعة ${enrollment.group_name}</span>` : ''}
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge ${statusBadgeClass} payment-status-badge me-2">
+                                            <i class="fas ${isPaid ? 'fa-check-circle' : 'fa-times-circle'} me-1"></i>
+                                            ${enrollment.payment_status || 'غير خالص'}
+                                        </span>
+                                        <button class="btn ${toggleBtnClass} btn-sm payment-toggle-btn"
+                                                data-enrollment-id="${enrollment.enrollment_id}"
+                                                data-current-status="${enrollment.payment_status || 'غير خالص'}">
+                                            <i class="fas ${toggleBtnIcon} me-1"></i>
+                                            ${toggleBtnText}
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            coursesList.appendChild(courseItem);
+                        });
+
+                        cardBody.appendChild(coursesList);
+                    }
+
+                    studentCard.appendChild(cardBody);
+                    studentsContainer.appendChild(studentCard);
+                });
+
+                // Show students container
+                studentsContainer.classList.remove('d-none');
+
+                // Add event listeners to payment toggle buttons
+                document.querySelectorAll('.payment-toggle-btn').forEach(button => {
+                    button.addEventListener('click', togglePaymentStatus);
+                });
+
+                // Add event listeners to payment report buttons
+                document.querySelectorAll('.print-payment-report-btn').forEach(button => {
+                    button.addEventListener('click', generatePaymentReport);
+                });
+            }
+
+            // Toggle payment status
+            function togglePaymentStatus(event) {
+                const button = event.currentTarget;
+                const enrollmentId = button.dataset.enrollmentId;
+                const currentStatus = button.dataset.currentStatus;
+                const newStatus = currentStatus === 'خالص' ? 'غير خالص' : 'خالص';
+
+                // Disable button and show loading state
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> جاري التحديث...';
+
+                // Update payment status via API
+                fetch(`/api/admin/enrollments/${enrollmentId}/payment-status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ payment_status: newStatus })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('فشل في تحديث حالة الدفع');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update UI
+                    const listItem = button.closest('.course-item');
+                    const statusBadge = listItem.querySelector('.payment-status-badge');
+
+                    // Update badge
+                    statusBadge.className = `badge payment-status-badge me-2 ${newStatus === 'خالص' ? 'bg-success' : 'bg-danger'}`;
+                    statusBadge.innerHTML = `<i class="fas ${newStatus === 'خالص' ? 'fa-check-circle' : 'fa-times-circle'} me-1"></i> ${newStatus}`;
+
+                    // Update button
+                    button.className = `btn ${newStatus === 'خالص' ? 'btn-outline-danger' : 'btn-outline-success'} btn-sm payment-toggle-btn`;
+                    button.innerHTML = `<i class="fas ${newStatus === 'خالص' ? 'fa-times-circle' : 'fa-check-circle'} me-1"></i> ${newStatus === 'خالص' ? 'غير خالص' : 'خالص'}`;
+                    button.dataset.currentStatus = newStatus;
+                    button.disabled = false;
+                })
+                .catch(error => {
+                    // Show error and re-enable button
+                    alert('حدث خطأ: ' + error.message);
+                    button.disabled = false;
+                    button.innerHTML = `<i class="fas ${currentStatus === 'خالص' ? 'fa-times-circle' : 'fa-check-circle'} me-1"></i> ${currentStatus === 'خالص' ? 'غير خالص' : 'خالص'}`;
+                });
+            }
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.trim();
+
+                // Obtener los valores actuales de los filtros
+                const filterDepartment = document.getElementById('filter-payment-department-select') ?
+                    document.getElementById('filter-payment-department-select').value : '';
+                const filterSemester = document.getElementById('filter-payment-semester-select') ?
+                    document.getElementById('filter-payment-semester-select').value : '';
+                const filterGroup = document.getElementById('filter-payment-group-select') ?
+                    document.getElementById('filter-payment-group-select').value : '';
+                const filterPaymentStatus = document.getElementById('filter-payment-status-select') ?
+                    document.getElementById('filter-payment-status-select').value : '';
+
+                // Usar la misma función de carga con filtros para mantener consistencia
+                loadStudentsEnrollments(filterDepartment, filterSemester, filterGroup, filterPaymentStatus, searchTerm);
+            });
+
+            // Generate payment report for a student
+            function generatePaymentReport(event) {
+                const button = event.currentTarget;
+                const studentId = button.dataset.studentId;
+                const studentCard = button.closest('.student-card');
+                const studentName = studentCard.dataset.studentName;
+                const studentRegistration = studentCard.dataset.studentRegistration;
+
+                // Show loading state
+                button.disabled = true;
+                const originalButtonHtml = button.innerHTML;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> جاري التحميل...';
+
+                // Fetch student data
+                fetch(`/api/admin/students/${studentId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('فشل في الحصول على بيانات الطالب');
+                        }
+                        return response.json();
+                    })
+                    .then(studentData => {
+                        const student = studentData.student;
+
+                        // Fetch student courses
+                        return fetch(`/api/admin/students/${studentId}/courses`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('فشل في الحصول على بيانات المواد');
+                                }
+                                return response.json();
+                            })
+                            .then(coursesData => {
+                                // Generate report
+                                generatePaymentReportPDF(student, coursesData);
+
+                                // Reset button
+                                button.disabled = false;
+                                button.innerHTML = originalButtonHtml;
+                            });
+                    })
+                    .catch(error => {
+                        // Show error and reset button
+                        alert('حدث خطأ: ' + error.message);
+                        button.disabled = false;
+                        button.innerHTML = originalButtonHtml;
+                    });
+            }
+
+            // Generate PDF report for payment status
+            function generatePaymentReportPDF(student, coursesData) {
+                // Filter courses by payment status
+                const paidCourses = coursesData.enrolledCourses.filter(course => course.payment_status === 'خالص');
+                const unpaidCourses = coursesData.enrolledCourses.filter(course => course.payment_status !== 'خالص');
+
+                // Generate report HTML
+                let reportHtml = `
+                    <div class="student-report-container">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">معلومات الطالب</h5>
+                                    <span class="badge bg-light text-dark">تاريخ التقرير: ${new Date().toLocaleDateString('ar-LY')}</span>
+                                </div>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <p class="mb-1"><strong>الاسم:</strong> ${student.name}</p>
+                                        <p class="mb-1"><strong>رقم القيد:</strong> ${student.student_id}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="mb-1"><strong>التخصص:</strong> ${student.department_name || 'غير محدد'}</p>
+                                        <p class="mb-1"><strong>الفصل الدراسي:</strong> ${student.semester || 'الأول'}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="mb-1"><strong>المجموعة:</strong> ${student.group_name || '-'}</p>
+                                        <p class="mb-1"><strong>رقم المنظومة:</strong> ${student.registration_number}</p>
+                                        <p class="mb-1"><strong>المواد المسجلة:</strong> ${coursesData.enrolledCourses.length}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="card-title mb-0">المواد المدفوعة (خالص)</h5>
+                            </div>
+                            <div class="card-body">
+                `;
+
+                if (paidCourses.length === 0) {
+                    reportHtml += `<div class="alert alert-info">لا توجد مواد مدفوعة</div>`;
+                } else {
+                    reportHtml += `
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>رمز المادة</th>
+                                        <th>اسم المادة</th>
+                                        <th>الفصل الدراسي</th>
+                                        <th>تاريخ التسجيل</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    paidCourses.forEach((course, index) => {
+                        // Format date
+                        const enrollmentDate = new Date(course.created_at);
+                        const formattedDate = enrollmentDate.toLocaleDateString('ar-LY');
+
+                        // Get course semester
+                        const courseSemester = course.semester || 'غير محدد';
+
+                        reportHtml += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${course.course_code}</td>
+                                <td>${course.course_name || course.name || 'غير محدد'}</td>
+                                <td>${courseSemester}</td>
+                                <td>${formattedDate}</td>
+                            </tr>
+                        `;
+                    });
+
+                    reportHtml += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+
+                reportHtml += `
+                            </div>
+                            <div class="card-footer text-muted text-center">
+                                إجمالي المواد المدفوعة: ${paidCourses.length}
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="card-title mb-0">المواد غير المدفوعة (غير خالص)</h5>
+                            </div>
+                            <div class="card-body">
+                `;
+
+                if (unpaidCourses.length === 0) {
+                    reportHtml += `<div class="alert alert-info">لا توجد مواد غير مدفوعة</div>`;
+                } else {
+                    reportHtml += `
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                                <thead class="table-danger">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>رمز المادة</th>
+                                        <th>اسم المادة</th>
+                                        <th>الفصل الدراسي</th>
+                                        <th>تاريخ التسجيل</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    unpaidCourses.forEach((course, index) => {
+                        // Format date
+                        const enrollmentDate = new Date(course.created_at);
+                        const formattedDate = enrollmentDate.toLocaleDateString('ar-LY');
+
+                        // Get course semester
+                        const courseSemester = course.semester || 'غير محدد';
+
+                        reportHtml += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${course.course_code}</td>
+                                <td>${course.course_name || course.name || 'غير محدد'}</td>
+                                <td>${courseSemester}</td>
+                                <td>${formattedDate}</td>
+                            </tr>
+                        `;
+                    });
+
+                    reportHtml += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+
+                reportHtml += `
+                            </div>
+                            <div class="card-footer text-muted text-center">
+                                إجمالي المواد غير المدفوعة: ${unpaidCourses.length}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Create a new window for printing
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="ar" dir="rtl">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>تقرير حالة الدفع - ${student.name}</title>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+                        <style>
+                            body {
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                direction: rtl;
+                                text-align: right;
+                                padding: 20px;
+                                color: #333;
+                                line-height: 1.6;
+                            }
+                            .container {
+                                max-width: 1000px;
+                                margin: 0 auto;
+                            }
+                            .report-header {
+                                text-align: center;
+                                margin-bottom: 30px;
+                                border-bottom: 2px solid #0d6efd;
+                                padding-bottom: 15px;
+                            }
+                            .report-header h2 {
+                                font-size: 24px;
+                                color: #0d6efd;
+                                margin-bottom: 5px;
+                            }
+                            .report-header p {
+                                color: #6c757d;
+                                font-size: 14px;
+                                margin-top: 0;
+                            }
+                            .card {
+                                margin-bottom: 25px;
+                                border: 1px solid #ddd;
+                                border-radius: 8px;
+                                box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                                page-break-inside: avoid;
+                            }
+                            .card-header {
+                                padding: 12px 20px;
+                                border-bottom: 1px solid #ddd;
+                                background-color: #f8f9fa;
+                                border-radius: 8px 8px 0 0;
+                                font-weight: bold;
+                            }
+                            .bg-primary {
+                                background-color: #0d6efd !important;
+                                color: white !important;
+                            }
+                            .bg-success {
+                                background-color: #198754 !important;
+                                color: white !important;
+                            }
+                            .bg-danger {
+                                background-color: #dc3545 !important;
+                                color: white !important;
+                            }
+                            .bg-light {
+                                background-color: #f8f9fa !important;
+                                color: #212529 !important;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 20px;
+                            }
+                            th, td {
+                                padding: 8px;
+                                border: 1px solid #ddd;
+                                text-align: right;
+                            }
+                            th {
+                                background-color: #f2f2f2;
+                            }
+                            .badge {
+                                padding: 5px 10px;
+                                border-radius: 4px;
+                                font-weight: bold;
+                            }
+                            .text-muted {
+                                color: #6c757d !important;
+                            }
+                            .text-center {
+                                text-align: center !important;
+                            }
+                            .alert {
+                                padding: 15px;
+                                margin-bottom: 20px;
+                                border: 1px solid transparent;
+                                border-radius: 4px;
+                            }
+                            .alert-info {
+                                color: #0c5460;
+                                background-color: #d1ecf1;
+                                border-color: #bee5eb;
+                            }
+                            @media print {
+                                .no-print {
+                                    display: none;
+                                }
+                                body {
+                                    padding: 0;
+                                    font-size: 11pt;
+                                    margin: 0;
+                                }
+                                .container {
+                                    max-width: 100%;
+                                    width: 100%;
+                                    padding: 0;
+                                    margin: 0;
+                                }
+                                .card {
+                                    border: none;
+                                    box-shadow: none;
+                                    margin-bottom: 10px;
+                                }
+                                .card-header {
+                                    background-color: #f8f9fa !important;
+                                    color: #000 !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                    padding: 8px !important;
+                                }
+                                .card-body {
+                                    padding: 8px !important;
+                                }
+                                .card-footer {
+                                    padding: 5px !important;
+                                }
+                                th, td {
+                                    padding: 4px !important;
+                                    font-size: 10pt !important;
+                                }
+                                th {
+                                    background-color: #f2f2f2 !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                .table-striped tbody tr:nth-of-type(odd) {
+                                    background-color: rgba(0, 0, 0, 0.03) !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                p {
+                                    margin-bottom: 0.3rem !important;
+                                }
+                                .report-header {
+                                    margin-bottom: 10px !important;
+                                    padding-bottom: 10px !important;
+                                }
+                                .report-header h2 {
+                                    font-size: 18pt !important;
+                                    margin-bottom: 2px !important;
+                                }
+                                .report-header p {
+                                    font-size: 12pt !important;
+                                }
+                                .badge {
+                                    border: 1px solid #ddd !important;
+                                    padding: 2px 5px !important;
+                                    font-size: 9pt !important;
+                                }
+                                .bg-success {
+                                    background-color: #198754 !important;
+                                    color: white !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                .bg-danger {
+                                    background-color: #dc3545 !important;
+                                    color: white !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                .table-success th {
+                                    background-color: #d1e7dd !important;
+                                    color: #0f5132 !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                .table-danger th {
+                                    background-color: #f8d7da !important;
+                                    color: #842029 !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <div class="report-header">
+                                <h2>تقرير حالة الدفع</h2>
+                                <p>جامعة الحاضرة - نظام التسجيل الإلكتروني</p>
+                            </div>
+                            ${reportHtml}
+                            <div class="no-print text-center mt-4">
+                                <button class="btn btn-primary" onclick="window.print()">طباعة</button>
+                                <button class="btn btn-secondary" onclick="window.close()">إغلاق</button>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            }
+
+            // Cargar departamentos en el selector de filtro
+            function loadDepartmentsIntoFilterSelect() {
+                const departmentSelect = document.getElementById('filter-payment-department-select');
+                if (!departmentSelect) return;
+
+                fetch('/api/admin/departments')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Mantener la opción "Todos los departamentos"
+                        const allOption = departmentSelect.querySelector('option[value=""]');
+                        departmentSelect.innerHTML = '';
+                        departmentSelect.appendChild(allOption);
+
+                        // Agregar opciones de departamentos
+                        data.departments.forEach(department => {
+                            const option = document.createElement('option');
+                            option.value = department.id;
+                            option.textContent = department.name;
+                            departmentSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading departments:', error);
+                    });
+            }
+
+            // Cargar grupos en el selector de filtro
+            function loadGroupsIntoFilterSelect() {
+                const groupSelect = document.getElementById('filter-payment-group-select');
+                if (!groupSelect) return;
+
+                // Usar la API de students-enrollments para obtener datos más completos
+                fetch('/api/admin/students-enrollments')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Mantener la opción "Todos los grupos"
+                        const allOption = groupSelect.querySelector('option[value=""]');
+                        groupSelect.innerHTML = '';
+                        groupSelect.appendChild(allOption);
+
+                        // Crear un conjunto para almacenar grupos únicos
+                        const uniqueGroups = new Set();
+
+                        // Recopilar todos los grupos únicos de estudiantes
+                        data.students.forEach(student => {
+                            if (student.group_name && student.group_name.trim() !== '') {
+                                uniqueGroups.add(student.group_name);
+                            }
+                        });
+
+                        console.log('Grupos de estudiantes cargados:', Array.from(uniqueGroups));
+
+                        // Agregar opciones de grupos
+                        Array.from(uniqueGroups).sort().forEach(groupName => {
+                            const option = document.createElement('option');
+                            option.value = groupName;
+                            option.textContent = `مجموعة ${groupName}`;
+                            groupSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading groups:', error);
+                    });
+            }
+
+            // Configurar eventos de filtrado
+            function setupFilterEvents() {
+                const searchInput = document.getElementById('search-input');
+                const departmentSelect = document.getElementById('filter-payment-department-select');
+                const semesterSelect = document.getElementById('filter-payment-semester-select');
+                const groupSelect = document.getElementById('filter-payment-group-select');
+                const paymentStatusSelect = document.getElementById('filter-payment-status-select');
+                const resetFiltersBtn = document.getElementById('reset-payment-filters');
+                const showFilteredReportBtn = document.getElementById('show-filtered-payment-report');
+
+                // Evento de búsqueda
+                if (searchInput) {
+                    searchInput.addEventListener('input', function() {
+                        const searchTerm = this.value.trim();
+                        const filterDepartment = departmentSelect ? departmentSelect.value : '';
+                        const filterSemester = semesterSelect ? semesterSelect.value : '';
+                        const filterGroup = groupSelect ? groupSelect.value : '';
+                        const filterPaymentStatus = paymentStatusSelect ? paymentStatusSelect.value : '';
+
+                        loadStudentsEnrollments(filterDepartment, filterSemester, filterGroup, filterPaymentStatus, searchTerm);
+                    });
+                }
+
+                // Evento de cambio de departamento
+                if (departmentSelect) {
+                    departmentSelect.addEventListener('change', function() {
+                        const filterDepartment = this.value;
+                        const searchTerm = searchInput ? searchInput.value.trim() : '';
+                        const filterSemester = semesterSelect ? semesterSelect.value : '';
+                        const filterGroup = groupSelect ? groupSelect.value : '';
+                        const filterPaymentStatus = paymentStatusSelect ? paymentStatusSelect.value : '';
+
+                        loadStudentsEnrollments(filterDepartment, filterSemester, filterGroup, filterPaymentStatus, searchTerm);
+                    });
+                }
+
+                // Evento de cambio de semestre
+                if (semesterSelect) {
+                    semesterSelect.addEventListener('change', function() {
+                        const filterSemester = this.value;
+                        const searchTerm = searchInput ? searchInput.value.trim() : '';
+                        const filterDepartment = departmentSelect ? departmentSelect.value : '';
+                        const filterGroup = groupSelect ? groupSelect.value : '';
+                        const filterPaymentStatus = paymentStatusSelect ? paymentStatusSelect.value : '';
+
+                        loadStudentsEnrollments(filterDepartment, filterSemester, filterGroup, filterPaymentStatus, searchTerm);
+                    });
+                }
+
+                // Evento de cambio de grupo
+                if (groupSelect) {
+                    groupSelect.addEventListener('change', function() {
+                        const filterGroup = this.value;
+                        const searchTerm = searchInput ? searchInput.value.trim() : '';
+                        const filterDepartment = departmentSelect ? departmentSelect.value : '';
+                        const filterSemester = semesterSelect ? semesterSelect.value : '';
+                        const filterPaymentStatus = paymentStatusSelect ? paymentStatusSelect.value : '';
+
+                        loadStudentsEnrollments(filterDepartment, filterSemester, filterGroup, filterPaymentStatus, searchTerm);
+                    });
+                }
+
+                // Evento de cambio de estado de pago
+                if (paymentStatusSelect) {
+                    paymentStatusSelect.addEventListener('change', function() {
+                        const filterPaymentStatus = this.value;
+                        const searchTerm = searchInput ? searchInput.value.trim() : '';
+                        const filterDepartment = departmentSelect ? departmentSelect.value : '';
+                        const filterSemester = semesterSelect ? semesterSelect.value : '';
+                        const filterGroup = groupSelect ? groupSelect.value : '';
+
+                        loadStudentsEnrollments(filterDepartment, filterSemester, filterGroup, filterPaymentStatus, searchTerm);
+                    });
+                }
+
+                // Evento de reseteo de filtros
+                if (resetFiltersBtn) {
+                    resetFiltersBtn.addEventListener('click', function() {
+                        if (searchInput) searchInput.value = '';
+                        if (departmentSelect) departmentSelect.value = '';
+                        if (semesterSelect) semesterSelect.value = '';
+                        if (groupSelect) groupSelect.value = '';
+                        if (paymentStatusSelect) paymentStatusSelect.value = '';
+
+                        // Ocultar mensaje "no hay resultados" si está visible
+                        const noResults = document.getElementById('no-results');
+                        if (noResults) {
+                            noResults.classList.add('d-none');
+                        }
+
+                        // Mostrar indicador de carga
+                        const loadingIndicator = document.getElementById('loading-indicator');
+                        if (loadingIndicator) {
+                            loadingIndicator.classList.remove('d-none');
+                        }
+
+                        loadStudentsEnrollments('', '', '', '', '');
+                    });
+                }
+
+                // Evento para mostrar informe filtrado
+                if (showFilteredReportBtn) {
+                    showFilteredReportBtn.addEventListener('click', function() {
+                        const filterDepartment = departmentSelect ? departmentSelect.value : '';
+                        const filterSemester = semesterSelect ? semesterSelect.value : '';
+                        const filterGroup = groupSelect ? groupSelect.value : '';
+                        const filterPaymentStatus = paymentStatusSelect ? paymentStatusSelect.value : '';
+
+                        openFilteredPaymentReportModal(filterDepartment, filterSemester, filterGroup, filterPaymentStatus);
+                    });
+                }
+
+                // Configurar evento para imprimir informe filtrado
+                const printFilteredReportBtn = document.getElementById('print-filtered-payment-report');
+                if (printFilteredReportBtn) {
+                    printFilteredReportBtn.addEventListener('click', function() {
+                        const reportContent = document.getElementById('filtered-payment-report-content');
+                        if (reportContent) {
+                            printFilteredPaymentReport(reportContent.innerHTML);
+                        }
+                    });
+                }
+            }
+
+            // Abrir modal de informe filtrado
+            function openFilteredPaymentReportModal(filterDepartment, filterSemester, filterGroup, filterPaymentStatus) {
+                // Mostrar modal
+                const modal = new bootstrap.Modal(document.getElementById('filteredPaymentReportModal'));
+                modal.show();
+
+                // Mostrar carga
+                document.getElementById('filtered-payment-report-loading').classList.remove('d-none');
+                document.getElementById('filtered-payment-report-error').classList.add('d-none');
+                document.getElementById('filtered-payment-report-content').classList.add('d-none');
+
+                // Obtener datos para el informe
+                fetch('/api/admin/students-enrollments')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('فشل في تحميل البيانات');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Filtrar los estudiantes según los criterios
+                        let filteredStudents = data.students;
+
+                        // Filtrar por departamento
+                        if (filterDepartment) {
+                            console.log('Informe: Filtrando por departamento:', filterDepartment, 'Tipo:', typeof filterDepartment);
+
+                            // Mostrar información detallada de cada estudiante y su departamento
+                            console.log('Información detallada de estudiantes y sus departamentos:');
+                            filteredStudents.forEach(student => {
+                                console.log(`Estudiante: ${student.name} (ID: ${student.id})`);
+                                console.log(`  Department ID: ${student.department_id}, Tipo: ${typeof student.department_id}`);
+                                console.log(`  Department Name: ${student.department_name}`);
+                            });
+
+                            // Mostrar información de departamentos disponibles
+                            const departamentosDisponibles = new Set();
+                            filteredStudents.forEach(student => {
+                                if (student.department_id) {
+                                    departamentosDisponibles.add(String(student.department_id));
+                                }
+                            });
+                            console.log('Informe: Departamentos disponibles en los datos:', Array.from(departamentosDisponibles));
+
+                            // Asegurarse de que la comparación sea consistente (string vs string)
+                            const filterDeptId = String(filterDepartment);
+                            console.log('ID de departamento a filtrar (convertido a string):', filterDeptId);
+
+                            // Obtener el nombre del departamento seleccionado para mostrar en el mensaje
+                            const departmentSelect = document.getElementById('filter-payment-department-select');
+                            const departmentName = departmentSelect ?
+                                departmentSelect.options[departmentSelect.selectedIndex].text : 'التخصص المحدد';
+                            console.log('Nombre del departamento seleccionado:', departmentName);
+
+                            // Verificar si hay estudiantes con este departamento
+                            const estudiantesFiltrados = filteredStudents.filter(student => {
+                                // Convertir ambos valores a string para comparación consistente
+                                const studentDeptId = student.department_id ? String(student.department_id) : '';
+
+                                // Intentar diferentes formatos de comparación
+                                const coincideExacto = studentDeptId === filterDeptId;
+                                const coincideNumerico = parseInt(studentDeptId) === parseInt(filterDeptId);
+
+                                // Verificar también por nombre de departamento si está disponible
+                                const coincidePorNombre = student.department_name &&
+                                    departmentName &&
+                                    student.department_name.trim() === departmentName.trim();
+
+                                const coincide = coincideExacto || coincideNumerico || coincidePorNombre;
+
+                                console.log(`  Comparando: Estudiante ${student.name}, Dept ID: ${studentDeptId}, Dept Name: ${student.department_name}`);
+                                console.log(`    con Filtro ID: ${filterDeptId}, Filtro Nombre: ${departmentName}`);
+                                console.log(`    Coincide: ${coincide} (Exacto: ${coincideExacto}, Numérico: ${coincideNumerico}, Por Nombre: ${coincidePorNombre})`);
+
+                                return coincide;
+                            });
+
+                            console.log('Informe: Estudiantes después del filtro de departamento:', estudiantesFiltrados.length);
+
+                            // Si no hay resultados, mantener la lista vacía en lugar de mostrar todos los estudiantes
+                            if (estudiantesFiltrados.length === 0) {
+                                console.log('No se encontraron estudiantes para el departamento seleccionado');
+                                filteredStudents = [];
+                            } else {
+                                console.log(`Se encontraron ${estudiantesFiltrados.length} estudiantes para el departamento seleccionado`);
+                                filteredStudents = estudiantesFiltrados;
+                            }
+                        }
+
+                        // Filtrar por estado de pago
+                        if (filterPaymentStatus) {
+                            console.log('Informe: Filtrando por estado de pago:', filterPaymentStatus);
+                            console.log('Informe: Estudiantes antes del filtro de estado de pago:', filteredStudents.length);
+
+                            // Mostrar información detallada de cada estudiante y sus inscripciones
+                            filteredStudents.forEach(student => {
+                                console.log(`Estudiante: ${student.name} (ID: ${student.id})`);
+                                if (student.enrollments && student.enrollments.length > 0) {
+                                    console.log(`  Tiene ${student.enrollments.length} inscripciones:`);
+                                    student.enrollments.forEach((enrollment, index) => {
+                                        console.log(`    ${index + 1}. Curso: ${enrollment.course_name}, Estado de pago: ${enrollment.payment_status}`);
+                                    });
+
+                                    // Verificar si todas las inscripciones están pagadas
+                                    const todasPagadas = student.enrollments.every(enrollment =>
+                                        enrollment.payment_status === 'paid' || enrollment.payment_status === 'خالص'
+                                    );
+                                    console.log(`  ¿Todas las inscripciones pagadas? ${todasPagadas ? 'SÍ' : 'NO'}`);
+
+                                    // Verificar si alguna inscripción no está pagada
+                                    const algunaNoPageada = student.enrollments.some(enrollment =>
+                                        enrollment.payment_status === 'unpaid' || enrollment.payment_status === 'غير خالص'
+                                    );
+                                    console.log(`  ¿Alguna inscripción no pagada? ${algunaNoPageada ? 'SÍ' : 'NO'}`);
+                                } else {
+                                    console.log(`  No tiene inscripciones`);
+                                }
+                            });
+
+                            // Filtrar estudiantes según el estado de pago de sus inscripciones
+                            const estudiantesFiltrados = filteredStudents.filter(student => {
+                                // Si el estudiante no tiene inscripciones, no coincide con ningún filtro de pago
+                                if (!student.enrollments || student.enrollments.length === 0) {
+                                    return false;
+                                }
+
+                                if (filterPaymentStatus === 'خالص') {
+                                    // Para "خالص" (pagado), todas las inscripciones deben estar pagadas
+                                    return student.enrollments.every(enrollment =>
+                                        enrollment.payment_status === 'paid' || enrollment.payment_status === 'خالص'
+                                    );
+                                } else if (filterPaymentStatus === 'غير خالص') {
+                                    // Para "غير خالص" (no pagado), al menos una inscripción debe estar sin pagar
+                                    return student.enrollments.some(enrollment =>
+                                        enrollment.payment_status === 'unpaid' || enrollment.payment_status === 'غير خالص'
+                                    );
+                                }
+
+                                // Si el filtro no coincide con ninguno de los valores esperados, no filtrar
+                                return true;
+                            });
+
+                            console.log('Informe: Estudiantes después del filtro de estado de pago:', estudiantesFiltrados.length);
+
+                            // Si no hay resultados, mantener la lista vacía
+                            if (estudiantesFiltrados.length === 0) {
+                                filteredStudents = [];
+                            } else {
+                                filteredStudents = estudiantesFiltrados;
+                            }
+                        }
+
+                        // Filtrar por semestre
+                        if (filterSemester) {
+                            console.log('Informe: Filtrando por semestre:', filterSemester);
+                            console.log('Informe: Estudiantes antes del filtro de semestre:', filteredStudents.length);
+
+                            // Mostrar información detallada de cada estudiante y su semestre
+                            console.log('Información detallada de estudiantes y sus semestres:');
+                            filteredStudents.forEach(student => {
+                                console.log(`Estudiante: ${student.name} (ID: ${student.id})`);
+                                console.log(`  Semestre: ${student.semester}`);
+
+                                // Mostrar semestres en inscripciones si existen
+                                if (student.enrollments && student.enrollments.length > 0) {
+                                    console.log(`  Semestres en inscripciones:`);
+                                    student.enrollments.forEach((enrollment, index) => {
+                                        console.log(`    ${index + 1}. Curso: ${enrollment.course_name}, Semestre: ${enrollment.semester || 'No especificado'}`);
+                                    });
+                                }
+                            });
+
+                            // Implementamos un filtro más flexible para el semestre
+                            const estudiantesFiltrados = filteredStudents.filter(student => {
+                                // Verificar si el estudiante tiene un semestre asignado que coincide con el filtro
+                                if (student.semester && student.semester === filterSemester) {
+                                    console.log(`  Estudiante ${student.name} coincide por semestre directo: ${student.semester}`);
+                                    return true;
+                                }
+
+                                // Verificar semestres en inscripciones
+                                if (student.enrollments && student.enrollments.length > 0) {
+                                    const coincidePorInscripcion = student.enrollments.some(enrollment => {
+                                        return enrollment.semester === filterSemester;
+                                    });
+
+                                    if (coincidePorInscripcion) {
+                                        console.log(`  Estudiante ${student.name} coincide por semestre en inscripción`);
+                                    }
+
+                                    return coincidePorInscripcion;
+                                }
+
+                                console.log(`  Estudiante ${student.name} no coincide con el semestre ${filterSemester}`);
+                                return false;
+                            });
+
+                            console.log('Informe: Estudiantes después del filtro de semestre:', estudiantesFiltrados.length);
+
+                            // Si no hay resultados, mantener la lista vacía
+                            if (estudiantesFiltrados.length === 0) {
+                                console.log('No se encontraron estudiantes para el semestre seleccionado');
+                                filteredStudents = [];
+                            } else {
+                                console.log(`Se encontraron ${estudiantesFiltrados.length} estudiantes para el semestre seleccionado`);
+                                filteredStudents = estudiantesFiltrados;
+                            }
+                        }
+
+                        // Filtrar por grupo de estudiante
+                        if (filterGroup) {
+                            console.log('Informe: Filtrando por grupo de estudiante:', filterGroup);
+
+                            // Mostrar información detallada de cada estudiante y su grupo
+                            console.log('Información detallada de estudiantes y sus grupos:');
+                            filteredStudents.forEach(student => {
+                                console.log(`Estudiante: ${student.name} (ID: ${student.id})`);
+                                console.log(`  Grupo: ${student.group_name || 'No especificado'}, Tipo: ${typeof student.group_name}`);
+
+                                // Mostrar grupos en inscripciones si existen
+                                if (student.enrollments && student.enrollments.length > 0) {
+                                    console.log(`  Grupos en inscripciones:`);
+                                    student.enrollments.forEach((enrollment, index) => {
+                                        console.log(`    ${index + 1}. Curso: ${enrollment.course_name}, Grupo: ${enrollment.group_name || 'No especificado'}`);
+                                    });
+                                }
+                            });
+
+                            // Mostrar información de grupos disponibles
+                            const gruposDisponibles = new Set();
+                            filteredStudents.forEach(student => {
+                                if (student.group_name) {
+                                    gruposDisponibles.add(student.group_name);
+                                }
+                                // También agregar grupos de inscripciones
+                                if (student.enrollments) {
+                                    student.enrollments.forEach(enrollment => {
+                                        if (enrollment.group_name) {
+                                            gruposDisponibles.add(enrollment.group_name);
+                                        }
+                                    });
+                                }
+                            });
+                            console.log('Informe: Grupos de estudiantes disponibles:', Array.from(gruposDisponibles));
+
+                            // Implementamos un filtro más flexible para el grupo
+                            const estudiantesFiltrados = filteredStudents.filter(student => {
+                                // Verificar coincidencia exacta
+                                const coincideExacto = student.group_name === filterGroup;
+
+                                // Verificar coincidencia ignorando mayúsculas/minúsculas
+                                const coincideInsensible = student.group_name &&
+                                    filterGroup &&
+                                    student.group_name.toLowerCase() === filterGroup.toLowerCase();
+
+                                // Verificar coincidencia parcial (contiene)
+                                const coincideParcial = student.group_name &&
+                                    filterGroup &&
+                                    student.group_name.includes(filterGroup);
+
+                                // Verificar grupos en inscripciones
+                                let coincidePorInscripcion = false;
+                                if (student.enrollments && student.enrollments.length > 0) {
+                                    coincidePorInscripcion = student.enrollments.some(enrollment => {
+                                        return enrollment.group_name === filterGroup;
+                                    });
+                                }
+
+                                const coincide = coincideExacto || coincideInsensible || coincideParcial || coincidePorInscripcion;
+
+                                console.log(`Estudiante ${student.name}, grupo: ${student.group_name}, coincide: ${coincide}`);
+                                console.log(`  Exacto: ${coincideExacto}, Insensible: ${coincideInsensible}, Parcial: ${coincideParcial}, Por inscripción: ${coincidePorInscripcion}`);
+
+                                return coincide;
+                            });
+
+                            console.log('Informe: Estudiantes después del filtro de grupo:', estudiantesFiltrados.length);
+
+                            // Si no hay resultados, mantener la lista vacía
+                            if (estudiantesFiltrados.length === 0) {
+                                console.log('No se encontraron estudiantes para el grupo seleccionado');
+                                filteredStudents = [];
+                            } else {
+                                console.log(`Se encontraron ${estudiantesFiltrados.length} estudiantes para el grupo seleccionado`);
+                                filteredStudents = estudiantesFiltrados;
+                            }
+                        }
+
+                        // Generar el informe
+                        generateFilteredPaymentReport(filteredStudents, filterDepartment, filterSemester, filterGroup);
+                    })
+                    .catch(error => {
+                        console.error('Error loading data for report:', error);
+                        document.getElementById('filtered-payment-report-loading').classList.add('d-none');
+                        const errorElement = document.getElementById('filtered-payment-report-error');
+                        errorElement.textContent = error.message || 'حدث خطأ أثناء تحميل البيانات';
+                        errorElement.classList.remove('d-none');
+                    });
+            }
+
+            // Generar informe de pago filtrado
+            function generateFilteredPaymentReport(students, filterDepartment, filterSemester, filterGroup) {
+                const reportContainer = document.getElementById('filtered-payment-report-content');
+
+                // Ocultar carga y mostrar contenido
+                document.getElementById('filtered-payment-report-loading').classList.add('d-none');
+                reportContainer.classList.remove('d-none');
+
+                // Si no hay estudiantes, mostrar mensaje
+                if (students.length === 0) {
+                    reportContainer.innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            لا توجد بيانات مطابقة للتصنيف المحدد
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Obtener información de filtros para el título
+                let filterInfo = '';
+                if (filterDepartment) {
+                    const departmentSelect = document.getElementById('filter-payment-department-select');
+                    const departmentName = departmentSelect ?
+                        departmentSelect.options[departmentSelect.selectedIndex].text : 'التخصص المحدد';
+                    filterInfo += `تخصص: ${departmentName}`;
+                }
+
+                if (filterSemester) {
+                    if (filterInfo) filterInfo += ' | ';
+                    filterInfo += `الفصل الدراسي: ${filterSemester}`;
+                }
+
+                if (filterGroup) {
+                    if (filterInfo) filterInfo += ' | ';
+                    filterInfo += `المجموعة: ${filterGroup}`;
+                }
+
+                if (!filterInfo) {
+                    filterInfo = 'جميع الطلبة';
+                }
+
+                // Calcular estadísticas
+                const totalStudents = students.length;
+                let totalPaidCourses = 0;
+                let totalUnpaidCourses = 0;
+
+                students.forEach(student => {
+                    if (student.enrollments) {
+                        student.enrollments.forEach(enrollment => {
+                            if (enrollment.payment_status === 'خالص' || enrollment.payment_status === 'paid') {
+                                totalPaidCourses++;
+                            } else {
+                                totalUnpaidCourses++;
+                            }
+                        });
+                    }
+                });
+
+                const totalCourses = totalPaidCourses + totalUnpaidCourses;
+                const paidPercentage = totalCourses > 0 ? ((totalPaidCourses / totalCourses) * 100).toFixed(2) : 0;
+
+                // Generar HTML del informe
+                let reportHtml = `
+                    <div class="report-header mb-4">
+                        <h4 class="text-center">تقرير حالة الدفع</h4>
+                        <p class="text-center text-muted">${filterInfo}</p>
+                        <p class="text-center">تاريخ التقرير: ${new Date().toLocaleDateString('ar-LY')}</p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">عدد الطلبة</h5>
+                                    <p class="card-text fs-4">${totalStudents}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">إجمالي المواد</h5>
+                                    <p class="card-text fs-4">${totalCourses}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">المواد المدفوعة</h5>
+                                    <p class="card-text fs-4">${totalPaidCourses}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">المواد غير المدفوعة</h5>
+                                    <p class="card-text fs-4">${totalUnpaidCourses}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-4" style="height: 25px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: ${paidPercentage}%;"
+                            aria-valuenow="${paidPercentage}" aria-valuemin="0" aria-valuemax="100">
+                            ${paidPercentage}% مدفوع
+                        </div>
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: ${100 - paidPercentage}%;"
+                            aria-valuenow="${100 - paidPercentage}" aria-valuemin="0" aria-valuemax="100">
+                            ${(100 - paidPercentage).toFixed(2)}% غير مدفوع
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>#</th>
+                                    <th>رقم القيد</th>
+                                    <th>اسم الطالب</th>
+                                    <th>التخصص</th>
+                                    <th>الفصل الدراسي</th>
+                                    <th>المجموعة</th>
+                                    <th>المواد المسجلة</th>
+                                    <th>المواد المدفوعة</th>
+                                    <th>المواد غير المدفوعة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                // Agregar filas de estudiantes
+                students.forEach((student, index) => {
+                    // Contar materias pagadas y no pagadas
+                    let paidCourses = 0;
+                    let unpaidCourses = 0;
+
+                    if (student.enrollments) {
+                        student.enrollments.forEach(enrollment => {
+                            if (enrollment.payment_status === 'خالص' || enrollment.payment_status === 'paid') {
+                                paidCourses++;
+                            } else {
+                                unpaidCourses++;
+                            }
+                        });
+                    }
+
+                    const totalStudentCourses = paidCourses + unpaidCourses;
+
+                    reportHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${student.student_id}</td>
+                            <td>${student.name}</td>
+                            <td>${student.department_name || 'غير محدد'}</td>
+                            <td>${student.semester || 'غير محدد'}</td>
+                            <td>${student.group_name || '-'}</td>
+                            <td>${totalStudentCourses}</td>
+                            <td><span class="badge bg-success">${paidCourses}</span></td>
+                            <td><span class="badge bg-danger">${unpaidCourses}</span></td>
+                        </tr>
+                    `;
+                });
+
+                reportHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                // Actualizar contenido del informe
+                reportContainer.innerHTML = reportHtml;
+            }
+
+            // Imprimir informe filtrado
+            function printFilteredPaymentReport(reportContent) {
+                // Crear ventana para imprimir
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="ar" dir="rtl">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>تقرير حالة الدفع</title>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+                        <style>
+                            body {
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                direction: rtl;
+                                text-align: right;
+                                padding: 20px;
+                                color: #333;
+                                line-height: 1.6;
+                            }
+                            .container {
+                                max-width: 1200px;
+                                margin: 0 auto;
+                            }
+                            .report-header {
+                                text-align: center;
+                                margin-bottom: 30px;
+                                border-bottom: 2px solid #0d6efd;
+                                padding-bottom: 15px;
+                            }
+                            .report-header h4 {
+                                font-size: 24px;
+                                color: #0d6efd;
+                                margin-bottom: 5px;
+                            }
+                            .report-header p {
+                                color: #6c757d;
+                                font-size: 14px;
+                                margin-top: 0;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 20px;
+                            }
+                            th, td {
+                                padding: 8px;
+                                border: 1px solid #ddd;
+                                text-align: right;
+                            }
+                            th {
+                                background-color: #f2f2f2;
+                            }
+                            .badge {
+                                padding: 5px 10px;
+                                border-radius: 4px;
+                                font-weight: bold;
+                            }
+                            .bg-success {
+                                background-color: #198754 !important;
+                                color: white !important;
+                            }
+                            .bg-danger {
+                                background-color: #dc3545 !important;
+                                color: white !important;
+                            }
+                            .bg-primary {
+                                background-color: #0d6efd !important;
+                                color: white !important;
+                            }
+                            .bg-light {
+                                background-color: #f8f9fa !important;
+                            }
+                            .text-white {
+                                color: white !important;
+                            }
+                            .progress {
+                                display: flex;
+                                height: 25px;
+                                overflow: hidden;
+                                font-size: 0.75rem;
+                                background-color: #e9ecef;
+                                border-radius: 0.25rem;
+                                margin-bottom: 1rem;
+                            }
+                            .progress-bar {
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                overflow: hidden;
+                                color: #fff;
+                                text-align: center;
+                                white-space: nowrap;
+                                transition: width 0.6s ease;
+                            }
+                            @media print {
+                                .no-print {
+                                    display: none;
+                                }
+                                body {
+                                    padding: 0;
+                                    font-size: 11pt;
+                                    margin: 0;
+                                }
+                                .container {
+                                    max-width: 100%;
+                                    width: 100%;
+                                    padding: 0;
+                                    margin: 0;
+                                }
+                                th, td {
+                                    padding: 4px !important;
+                                    font-size: 10pt !important;
+                                }
+                                th {
+                                    background-color: #f2f2f2 !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                .badge {
+                                    border: 1px solid #ddd !important;
+                                    padding: 2px 5px !important;
+                                    font-size: 9pt !important;
+                                }
+                                .bg-success {
+                                    background-color: #198754 !important;
+                                    color: white !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                .bg-danger {
+                                    background-color: #dc3545 !important;
+                                    color: white !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                .bg-primary {
+                                    background-color: #0d6efd !important;
+                                    color: white !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                .progress-bar.bg-success {
+                                    background-color: #198754 !important;
+                                    color: white !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                .progress-bar.bg-danger {
+                                    background-color: #dc3545 !important;
+                                    color: white !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            ${reportContent}
+                            <div class="no-print text-center mt-4">
+                                <button class="btn btn-primary" onclick="window.print()">طباعة</button>
+                                <button class="btn btn-secondary" onclick="window.close()">إغلاق</button>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            }
+
+
+
+            // Initial load
+            loadDepartmentsIntoFilterSelect();
+            loadGroupsIntoFilterSelect();
+            setupFilterEvents();
+            loadStudentsEnrollments();
+        });
+    </script>
+</body>
+</html>

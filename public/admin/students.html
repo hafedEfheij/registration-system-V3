@@ -55,6 +55,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="payment-management.html">
+                                <i class="fas fa-money-bill-wave"></i>
+                                إدارة حالة الدفع
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="profile.html">
                                 <i class="fas fa-user-cog"></i>
                                 إعدادات الحساب
@@ -132,7 +138,13 @@
                                             <option value="السادس">السادس</option>
                                             <option value="السابع">السابع</option>
                                             <option value="الثامن">الثامن</option>
+                                            <option value="التاسع">التاسع</option>
+                                            <option value="العاشر">العاشر</option>
                                         </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="group-name" class="form-label">اسم المجموعة</label>
+                                        <input type="text" class="form-control" id="group-name" placeholder="مثال: أ، ب، ج، د">
                                     </div>
                                     <div class="col-12">
                                         <button type="submit" class="btn btn-primary">إضافة</button>
@@ -215,18 +227,30 @@
                                                 <option value="السادس">الفصل السادس</option>
                                                 <option value="السابع">الفصل السابع</option>
                                                 <option value="الثامن">الفصل الثامن</option>
+                                                <option value="التاسع">الفصل التاسع</option>
+                                                <option value="العاشر">الفصل العاشر</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 text-end">
-                                        <button class="btn btn-outline-secondary" id="reset-student-filters">
-                                            <i class="fas fa-sync"></i> إعادة تعيين
-                                        </button>
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-users"></i>
+                                            </span>
+                                            <select class="form-select" id="filter-student-group-select">
+                                                <option value="">جميع المجموعات</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <button class="btn btn-outline-secondary w-100" id="reset-student-filters">
+                                            <i class="fas fa-sync"></i> إعادة تعيين
+                                        </button>
+                                    </div>
                                     <div class="col-md-6">
-                                        <button class="btn btn-success" id="show-filtered-report">
+                                        <button class="btn btn-success w-100" id="show-filtered-report">
                                             <i class="fas fa-file-alt"></i> عرض تقرير حسب التصنيف
                                         </button>
                                     </div>
@@ -247,6 +271,7 @@
                                                 <th>الاسم</th>
                                                 <th>التخصص</th>
                                                 <th>الفصل الدراسي</th>
+                                                <th>المجموعة</th>
                                                 <th>رقم المنظومة</th>
                                                 <th class="text-center">الإجراءات</th>
                                             </tr>
@@ -310,7 +335,13 @@
                                 <option value="السادس">السادس</option>
                                 <option value="السابع">السابع</option>
                                 <option value="الثامن">الثامن</option>
+                                <option value="التاسع">التاسع</option>
+                                <option value="العاشر">العاشر</option>
                             </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit-group-name" class="form-label">اسم المجموعة</label>
+                            <input type="text" class="form-control" id="edit-group-name" placeholder="مثال: أ، ب، ج، د">
                         </div>
                     </form>
                 </div>
@@ -443,12 +474,58 @@
         </div>
     </div>
 
+    <!-- Modal Cleanup Button -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+        <button id="fix-modals-button" class="btn btn-warning rounded-circle" style="width: 50px; height: 50px; display: none;" title="إصلاح النوافذ المنبثقة">
+            <i class="fas fa-tools"></i>
+        </button>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Responsive JS -->
     <script src="../js/responsive.js"></script>
     <!-- Responsive Tables JS -->
     <script src="../js/responsive-tables.js"></script>
+    <!-- Modal Fixes JS -->
+    <script src="../js/modal-fixes.js"></script>
     <script src="../js/main.js"></script>
+    <!-- Auto Logout JS -->
+    <script src="../js/auto-logout.js"></script>
+
+    <script>
+        // Setup fix modals button
+        document.addEventListener('DOMContentLoaded', function() {
+            const fixModalsButton = document.getElementById('fix-modals-button');
+            if (fixModalsButton) {
+                // Show button when backdrop is detected without open modals
+                setInterval(() => {
+                    const openModals = document.querySelectorAll('.modal.show');
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    if (backdrops.length > 0 && openModals.length === 0) {
+                        fixModalsButton.style.display = 'block';
+                    } else {
+                        fixModalsButton.style.display = 'none';
+                    }
+                }, 1000);
+
+                // Add click event to clean up modals
+                fixModalsButton.addEventListener('click', function() {
+                    if (typeof window.cleanupModals === 'function') {
+                        const result = window.cleanupModals();
+                        alert(`تم إصلاح النوافذ المنبثقة: تم إغلاق ${result.modalsCleanedUp} نافذة وإزالة ${result.backdropsRemoved} خلفية.`);
+                    } else {
+                        // Fallback cleanup
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                        alert('تم إصلاح النوافذ المنبثقة.');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

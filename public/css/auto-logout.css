@@ -1,0 +1,60 @@
+/* Auto Logout CSS */
+
+/* Large switch style */
+.form-switch-lg .form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+    margin-top: 0.3rem;
+}
+
+/* Disabled state styling */
+.opacity-50 {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+/* Current timeout display */
+#current-timeout-display {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    font-size: 1rem;
+}
+
+#current-timeout-display-container {
+    min-width: 70px;
+    text-align: center;
+}
+
+/* Card hover effect */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Animated icons */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.auto-logout-current-timeout-card .fa-clock {
+    animation: pulse 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+}

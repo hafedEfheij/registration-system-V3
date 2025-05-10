@@ -34,7 +34,7 @@ function formatDateWithLatinNumerals(date) {
 }
 
 // Function to create HTML content for the report
-function createReportHtml(course, students) {
+function createReportHtml(course, students, groups = []) {
     // Format date with Latin numerals
     const reportDate = formatDateWithLatinNumerals(new Date());
 
@@ -62,9 +62,57 @@ function createReportHtml(course, students) {
                 </div>
             </div>
             <p><strong>تاريخ التقرير:</strong> ${reportDate}</p>
-        </div>
+        </div>`;
 
+    // Add groups section if groups are provided
+    if (groups && groups.length > 0) {
+        html += `
         <div style="margin-bottom: 20px;">
+            <h2 style="font-size: 18px; color: #333; margin-bottom: 10px;">مجموعات المادة</h2>
+            <table style="width: 100%; border-collapse: collapse; text-align: right;">
+                <thead>
+                    <tr style="background-color: #0d6efd; color: white;">
+                        <th style="padding: 10px; border: 1px solid #dee2e6;">اسم المجموعة</th>
+                        <th style="padding: 10px; border: 1px solid #dee2e6;">أستاذ المادة</th>
+                        <th style="padding: 10px; border: 1px solid #dee2e6;">الموعد</th>
+                        <th style="padding: 10px; border: 1px solid #dee2e6;">عدد الطلبة</th>
+                        <th style="padding: 10px; border: 1px solid #dee2e6;">الحد الأقصى</th>
+                        <th style="padding: 10px; border: 1px solid #dee2e6;">نسبة التسجيل</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        // Add group rows
+        groups.forEach((group, index) => {
+            // Format group data with Latin numerals
+            const enrolledStudents = convertToArabicNumerals(group.enrolled_students);
+            const maxStudents = convertToArabicNumerals(group.max_students);
+            const enrollmentPercentage = convertToArabicNumerals(parseFloat(group.enrollment_percentage).toFixed(2));
+
+            // Add row with alternating background color
+            const bgColor = index % 2 === 0 ? '#f8f9fa' : 'white';
+
+            html += `
+                <tr style="background-color: ${bgColor};">
+                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">${group.group_name}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6;">${group.professor_name || 'غير محدد'}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6;">${group.time_slot || 'غير محدد'}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6;">${enrolledStudents}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6;">${maxStudents}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6;">${enrollmentPercentage} %</td>
+                </tr>`;
+        });
+
+        html += `
+                </tbody>
+            </table>
+        </div>`;
+    }
+
+    // Add students section
+    html += `
+        <div style="margin-bottom: 20px;">
+            <h2 style="font-size: 18px; color: #333; margin-bottom: 10px;">قائمة الطلبة المسجلين</h2>
             <table style="width: 100%; border-collapse: collapse; text-align: right;">
                 <thead>
                     <tr style="background-color: #343a40; color: white;">
@@ -73,6 +121,7 @@ function createReportHtml(course, students) {
                         <th style="padding: 10px; border: 1px solid #dee2e6;">اسم الطالب</th>
                         <th style="padding: 10px; border: 1px solid #dee2e6;">رقم المنظومة</th>
                         <th style="padding: 10px; border: 1px solid #dee2e6;">التخصص</th>
+                        <th style="padding: 10px; border: 1px solid #dee2e6;">المجموعة</th>
                         <th style="padding: 10px; border: 1px solid #dee2e6;">الفصل الدراسي</th>
                         <th style="padding: 10px; border: 1px solid #dee2e6;">تاريخ التسجيل</th>
                     </tr>
@@ -84,7 +133,7 @@ function createReportHtml(course, students) {
     if (students.length === 0) {
         html += `
             <tr>
-                <td colspan="7" style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">لا يوجد طلبة مسجلين في هذه المادة</td>
+                <td colspan="8" style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">لا يوجد طلبة مسجلين في هذه المادة</td>
             </tr>
         `;
     } else {
@@ -103,6 +152,21 @@ function createReportHtml(course, students) {
             // Ensure semester has a value
             const semester = student.semester || 'الأول';
 
+            // Get student's group
+            let studentGroup = 'غير محدد';
+            if (student.group_name) {
+                studentGroup = student.group_name;
+            } else if (groups && groups.length > 0) {
+                // Try to find the student's group from the groups data
+                // This is a fallback in case the student object doesn't have group_name
+                const studentGroups = groups.filter(group => {
+                    return group.students && group.students.some(s => s.id === student.id || s.student_id === student.student_id);
+                });
+                if (studentGroups.length > 0) {
+                    studentGroup = studentGroups[0].group_name;
+                }
+            }
+
             html += `
                 <tr style="background-color: ${bgColor};">
                     <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">${rowNumber}</td>
@@ -110,6 +174,7 @@ function createReportHtml(course, students) {
                     <td style="padding: 10px; border: 1px solid #dee2e6;">${student.name}</td>
                     <td style="padding: 10px; border: 1px solid #dee2e6;">${registrationNumber}</td>
                     <td style="padding: 10px; border: 1px solid #dee2e6;">${student.department_name || 'غير محدد'}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">${studentGroup}</td>
                     <td style="padding: 10px; border: 1px solid #dee2e6;">${semester}</td>
                     <td style="padding: 10px; border: 1px solid #dee2e6;">${formattedDate}</td>
                 </tr>
@@ -182,10 +247,10 @@ function exportStudentsToPdf(course, students) {
 }
 
 // Function to view students data as PDF in a new window
-function viewStudentsAsPdf(course, students) {
+function viewStudentsAsPdf(course, students, groups = []) {
     try {
         // Create HTML content
-        const htmlContent = createReportHtml(course, students);
+        const htmlContent = createReportHtml(course, students, groups);
 
         // Open a new window
         const newWindow = window.open('', '_blank');
@@ -239,15 +304,15 @@ function viewStudentsAsPdf(course, students) {
         alert('حدث خطأ أثناء فتح التقرير: ' + error.message);
 
         // Fallback to HTML download
-        downloadAsHtml(course, students);
+        downloadAsHtml(course, students, groups);
     }
 }
 
 // Function to download report as HTML
-function downloadAsHtml(course, students) {
+function downloadAsHtml(course, students, groups = []) {
     try {
         // Create HTML content
-        const htmlContent = createReportHtml(course, students);
+        const htmlContent = createReportHtml(course, students, groups);
 
         // Create full HTML document
         const fullHtml = `
