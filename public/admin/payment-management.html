@@ -545,91 +545,89 @@
                             console.log('Filtrando por grupo de estudiante:', filterGroup);
                             console.log('Estudiantes antes del filtro de grupo:', filteredStudents.length);
 
-                            // Recopilar grupos disponibles en las inscripciones
+                            // Recopilar grupos disponibles en las inscripciones y mostrar información detallada
                             const gruposDisponibles = new Set();
+                            const gruposInfo = [];
+
                             filteredStudents.forEach(student => {
                                 if (student.enrollments && student.enrollments.length > 0) {
                                     student.enrollments.forEach(enrollment => {
                                         if (enrollment.group_name) {
                                             gruposDisponibles.add(enrollment.group_name);
+                                            gruposInfo.push({
+                                                studentName: student.name,
+                                                studentId: student.id,
+                                                enrollmentId: enrollment.enrollment_id,
+                                                groupName: enrollment.group_name,
+                                                groupId: enrollment.group_id,
+                                                courseName: enrollment.course_name
+                                            });
                                         }
                                     });
                                 }
                             });
+
                             console.log('Grupos disponibles en las inscripciones:', Array.from(gruposDisponibles));
+                            console.log('Información detallada de grupos:', gruposInfo);
+
+                            // Crear una copia de los estudiantes originales para el filtrado
+                            const estudiantesFiltrados = [];
 
                             // Verificar si hay grupos disponibles
                             if (gruposDisponibles.size > 0) {
-                                filteredStudents = filteredStudents.filter(student => {
-                                    // Verificar si alguna inscripción del estudiante tiene el grupo buscado
+                                // Iterar sobre cada estudiante y verificar sus inscripciones
+                                filteredStudents.forEach(student => {
+                                    // Verificar si el estudiante tiene inscripciones
                                     if (student.enrollments && student.enrollments.length > 0) {
-                                        const tieneGrupo = student.enrollments.some(enrollment =>
+                                        // Crear una copia del estudiante para modificar sus inscripciones
+                                        const studentCopy = JSON.parse(JSON.stringify(student));
+
+                                        // Filtrar solo las inscripciones que coinciden con el grupo seleccionado
+                                        const enrollmentsInGroup = student.enrollments.filter(enrollment =>
                                             enrollment.group_name === filterGroup
                                         );
-                                        console.log(`Estudiante ${student.name}: ¿Tiene grupo ${filterGroup}? ${tieneGrupo}`);
-                                        return tieneGrupo;
+
+                                        // Si el estudiante tiene inscripciones en el grupo seleccionado
+                                        if (enrollmentsInGroup.length > 0) {
+                                            console.log(`Estudiante ${student.name}: Tiene ${enrollmentsInGroup.length} inscripciones en grupo ${filterGroup}`);
+
+                                            // Actualizar las inscripciones del estudiante para mostrar solo las del grupo seleccionado
+                                            studentCopy.enrollments = enrollmentsInGroup;
+
+                                            // Añadir el estudiante a la lista filtrada
+                                            estudiantesFiltrados.push(studentCopy);
+                                        } else {
+                                            console.log(`Estudiante ${student.name}: No tiene inscripciones en grupo ${filterGroup}`);
+                                        }
                                     }
-                                    return false;
                                 });
+
+                                console.log(`Encontrados ${estudiantesFiltrados.length} estudiantes con inscripciones en grupo ${filterGroup}`);
+
+                                // Actualizar la lista de estudiantes filtrados
+                                filteredStudents = estudiantesFiltrados;
 
                                 // Si no hay resultados después del filtro, mostramos un mensaje
                                 if (filteredStudents.length === 0) {
                                     console.warn('No se encontraron estudiantes para el grupo:', filterGroup);
-                                    console.warn('Mostrando todos los estudiantes...');
 
-                                    // Recuperamos todos los estudiantes nuevamente
-                                    filteredStudents = data.students;
-
-                                    // Aplicamos nuevamente los filtros anteriores si existen
-                                    if (filterDepartment) {
-                                        // Obtener el nombre del departamento seleccionado
-                                        const departmentSelect = document.getElementById('filter-payment-department-select');
-                                        const departmentName = departmentSelect ?
-                                            departmentSelect.options[departmentSelect.selectedIndex].text : 'التخصص المحدد';
-
-                                        filteredStudents = filteredStudents.filter(student => {
-                                            const studentDeptId = student.department_id ? String(student.department_id) : '';
-                                            const filterDeptId = String(filterDepartment);
-
-                                            // Intentar diferentes formatos de comparación
-                                            const coincideExacto = studentDeptId === filterDeptId;
-                                            const coincideNumerico = parseInt(studentDeptId) === parseInt(filterDeptId);
-
-                                            // Verificar también por nombre de departamento si está disponible
-                                            const coincidePorNombre = student.department_name &&
-                                                departmentName &&
-                                                student.department_name.trim() === departmentName.trim();
-
-                                            return coincideExacto || coincideNumerico || coincidePorNombre;
-                                        });
+                                    // Personalizar el mensaje de "no hay resultados"
+                                    const noResultsMessage = document.getElementById('no-results-message');
+                                    if (noResultsMessage) {
+                                        noResultsMessage.textContent = `لا توجد بيانات متاحة للمجموعة "${filterGroup}".`;
                                     }
-
-                                    if (filterSemester) {
-                                        filteredStudents = filteredStudents.filter(student => {
-                                            // Verificar semestre del estudiante
-                                            if (student.semester && student.semester === filterSemester) {
-                                                return true;
-                                            }
-
-                                            // Verificar semestres en inscripciones
-                                            if (student.enrollments && student.enrollments.length > 0) {
-                                                return student.enrollments.some(enrollment =>
-                                                    enrollment.semester === filterSemester
-                                                );
-                                            }
-
-                                            return false;
-                                        });
-                                    }
-
-                                    // No mostramos alerta al usuario para mejorar la experiencia
-                                    console.log('Filtro de grupo sin resultados, mostrando todos los estudiantes sin alerta');
                                 }
                             } else {
                                 console.log('No hay grupos disponibles en las inscripciones, desactivando filtro de grupo temporalmente');
 
-                                // No mostramos alerta al usuario para mejorar la experiencia
-                                console.log('No hay grupos disponibles, ignorando filtro de grupo sin mostrar alerta');
+                                // Personalizar el mensaje de "no hay resultados"
+                                const noResultsMessage = document.getElementById('no-results-message');
+                                if (noResultsMessage) {
+                                    noResultsMessage.textContent = `لا توجد بيانات متاحة للمجموعات.`;
+                                }
+
+                                // Vaciar la lista de estudiantes para mostrar "no hay resultados"
+                                filteredStudents = [];
                             }
 
                             console.log('Estudiantes después del filtro de grupo:', filteredStudents.length);
