@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#0d6efd" />
+  <circle cx="100" cy="100" r="85" fill="#ffffff" />
+  <circle cx="100" cy="100" r="80" fill="#0d6efd" />
+  
+  <!-- University Building -->
+  <rect x="50" y="80" width="100" height="70" fill="#ffffff" />
+  
+  <!-- Pillars -->
+  <rect x="60" y="80" width="10" height="70" fill="#0d6efd" />
+  <rect x="85" y="80" width="10" height="70" fill="#0d6efd" />
+  <rect x="110" y="80" width="10" height="70" fill="#0d6efd" />
+  <rect x="135" y="80" width="10" height="70" fill="#0d6efd" />
+  
+  <!-- Roof -->
+  <polygon points="40,80 100,40 160,80" fill="#ffffff" />
+  
+  <!-- Text at the bottom -->
+  <text x="100" y="170" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#ffffff">جامعة الحاضرة</text>
+  
+  <!-- Decorative Stars -->
+  <polygon points="30,30 35,20 40,30 30,25 40,25" fill="#ffffff" />
+  <polygon points="170,30 175,20 180,30 170,25 180,25" fill="#ffffff" />
+  <polygon points="100,25 105,15 110,25 100,20 110,20" fill="#ffffff" />
+</svg>

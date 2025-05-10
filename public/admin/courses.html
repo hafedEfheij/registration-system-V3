@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المواد - جامعة الحاضرة</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <img src="../images/images.jpg" alt="شعار الجامعة" class="img-fluid mb-3" style="max-height: 80px;">
+                        <h5 class="text-white">جامعة الحاضرة</h5>
+                        <p class="text-white fw-bold">لوحة تحكم المشرف</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fas fa-tachometer-alt"></i>
+                                لوحة التحكم
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="students.html">
+                                <i class="fas fa-user-graduate"></i>
+                                إدارة الطلبة
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="departments.html">
+                                <i class="fas fa-building"></i>
+                                إدارة التخصصات
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="courses.html">
+                                <i class="fas fa-book"></i>
+                                إدارة المواد
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="course-statistics.html">
+                                <i class="fas fa-chart-bar"></i>
+                                إحصائيات المواد
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="payment-management.html">
+                                <i class="fas fa-money-bill-wave"></i>
+                                إدارة حالة الدفع
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.html">
+                                <i class="fas fa-user-cog"></i>
+                                إعدادات الحساب
+                            </a>
+                        </li>
+                        <li class="nav-item mt-5">
+                            <a class="nav-link text-danger" href="#" id="logout-button">
+                                <i class="fas fa-sign-out-alt"></i>
+                                تسجيل الخروج
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">إدارة المواد</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i>
+                                <span id="user-name">المشرف</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="profile.html">إعدادات الحساب</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logout-button">تسجيل الخروج</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="card-title mb-0">إضافة مادة جديدة</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="course-form-error" class="alert alert-danger d-none" role="alert">
+                                    حدث خطأ أثناء إضافة المادة
+                                </div>
+                                <div id="course-form-success" class="alert alert-success d-none" role="alert">
+                                    تمت إضافة المادة بنجاح
+                                </div>
+                                <form id="add-course-form">
+                                    <div class="mb-3">
+                                        <label for="course-code" class="form-label">رمز المادة</label>
+                                        <input type="text" class="form-control" id="course-code" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="course-name" class="form-label">اسم المادة</label>
+                                        <input type="text" class="form-control" id="course-name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="course-department-select" class="form-label">التخصص</label>
+                                        <select class="form-select" id="course-department-select" required>
+                                            <option value="">اختر التخصص</option>
+                                        </select>
+                                    </div>
+                                    <!-- الحد الأقصى للطلبة يتم حسابه تلقائيًا من مجموع المجموعات -->
+                                    <div class="mb-3">
+                                        <label for="course-semester" class="form-label">الفصل الدراسي</label>
+                                        <select class="form-select" id="course-semester">
+                                            <option value="">اختر الفصل الدراسي (اختياري)</option>
+                                            <option value="الأول">الأول</option>
+                                            <option value="الثاني">الثاني</option>
+                                            <option value="الثالث">الثالث</option>
+                                            <option value="الرابع">الرابع</option>
+                                            <option value="الخامس">الخامس</option>
+                                            <option value="السادس">السادس</option>
+                                            <option value="السابع">السابع</option>
+                                            <option value="الثامن">الثامن</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-info">إضافة</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="card-title mb-0">إضافة متطلب لمادة</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="add-prerequisite-form">
+                                    <div class="mb-3">
+                                        <label for="prerequisite-department-select" class="form-label">تصنيف حسب التخصص</label>
+                                        <select class="form-select" id="prerequisite-department-select">
+                                            <option value="">جميع التخصصات</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="course-select" class="form-label">المادة</label>
+                                        <select class="form-select" id="course-select" required>
+                                            <option value="">اختر المادة</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="prerequisite-select" class="form-label">المادة المتطلبة</label>
+                                        <select class="form-select" id="prerequisite-select" required>
+                                            <option value="">اختر المادة المتطلبة</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning">إضافة</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="card-title mb-0">قائمة المواد</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="course-search" placeholder="بحث عن مادة...">
+                                            <button class="btn btn-outline-secondary" type="button" id="course-search-btn">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-university"></i>
+                                            </span>
+                                            <select class="form-select" id="filter-department-select">
+                                                <option value="">جميع التخصصات</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-layer-group"></i>
+                                            </span>
+                                            <select class="form-select" id="filter-course-semester-select">
+                                                <option value="">جميع الفصول الدراسية</option>
+                                                <option value="الأول">الفصل الأول</option>
+                                                <option value="الثاني">الفصل الثاني</option>
+                                                <option value="الثالث">الفصل الثالث</option>
+                                                <option value="الرابع">الفصل الرابع</option>
+                                                <option value="الخامس">الفصل الخامس</option>
+                                                <option value="السادس">الفصل السادس</option>
+                                                <option value="السابع">الفصل السابع</option>
+                                                <option value="الثامن">الفصل الثامن</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        <button class="btn btn-outline-secondary" id="reset-filters">
+                                            <i class="fas fa-sync"></i> إعادة تعيين
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <div id="current-course-filters" class="alert alert-info d-none">
+                                            <i class="fas fa-filter"></i> <span id="current-course-filter-text">عرض جميع المواد</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive-stack">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>رمز المادة</th>
+                                                <th>اسم المادة</th>
+                                                <th>التخصص</th>
+                                                <th>الفصل الدراسي</th>
+                                                <th>الحد الأقصى للطلبة</th>
+                                                <th class="text-center">المجموعات</th>
+                                                <th class="text-center">الإجراءات</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="courses-table-body">
+                                            <!-- Courses will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Course Modal -->
+    <div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="editCourseModalLabel">تعديل المادة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="edit-course-form-error" class="alert alert-danger d-none" role="alert">
+                        حدث خطأ أثناء تعديل المادة
+                    </div>
+                    <div id="edit-course-form-success" class="alert alert-success d-none" role="alert">
+                        تم تعديل المادة بنجاح
+                    </div>
+                    <form id="edit-course-form" class="row g-3">
+                        <input type="hidden" id="edit-course-id">
+                        <div class="col-md-6">
+                            <label for="edit-course-code" class="form-label">رمز المادة</label>
+                            <input type="text" class="form-control" id="edit-course-code" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit-course-name" class="form-label">اسم المادة</label>
+                            <input type="text" class="form-control" id="edit-course-name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit-course-department-select" class="form-label">التخصص</label>
+                            <select class="form-select" id="edit-course-department-select" required>
+                                <option value="">اختر التخصص</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit-max-students-display" class="form-label">الحد الأقصى للطلبة (يتم حسابه تلقائيًا)</label>
+                            <div class="form-control bg-light text-center" id="edit-max-students-display" readonly>0</div>
+                            <input type="hidden" id="edit-max-students" value="0">
+                            <small class="text-muted">يتم حساب الحد الأقصى للطلبة تلقائيًا من مجموع المجموعات</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit-course-semester" class="form-label">الفصل الدراسي</label>
+                            <select class="form-select" id="edit-course-semester">
+                                <option value="">اختر الفصل الدراسي (اختياري)</option>
+                                <option value="الأول">الأول</option>
+                                <option value="الثاني">الثاني</option>
+                                <option value="الثالث">الثالث</option>
+                                <option value="الرابع">الرابع</option>
+                                <option value="الخامس">الخامس</option>
+                                <option value="السادس">السادس</option>
+                                <option value="السابع">السابع</option>
+                                <option value="الثامن">الثامن</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-info" id="save-course-changes">حفظ التغييرات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Prerequisites Modal -->
+    <div class="modal fade" id="coursePrerequisitesModal" tabindex="-1" aria-labelledby="coursePrerequisitesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="coursePrerequisitesModalLabel">إدارة متطلبات المادة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="prerequisites-loading" class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">جاري التحميل...</span>
+                        </div>
+                        <p>جاري تحميل بيانات المتطلبات...</p>
+                    </div>
+                    <div id="prerequisites-error" class="alert alert-danger d-none" role="alert">
+                        حدث خطأ أثناء تحميل بيانات المتطلبات
+                    </div>
+                    <div id="prerequisites-content" class="d-none">
+                        <div class="course-info mb-4">
+                            <h5 id="prerequisites-course-name" class="mb-2"></h5>
+                            <p id="prerequisites-course-details" class="text-muted"></p>
+                        </div>
+
+                        <h6 class="mt-4 mb-3">المتطلبات الحالية</h6>
+                        <div id="current-prerequisites-container">
+                            <div class="alert alert-info">لا توجد متطلبات لهذه المادة</div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h6 class="mb-3">إضافة متطلب جديد</h6>
+                            <form id="add-prerequisite-modal-form">
+                                <input type="hidden" id="prerequisite-course-id">
+                                <div class="mb-3">
+                                    <label for="prerequisite-department-select-modal" class="form-label">تصنيف حسب التخصص</label>
+                                    <select class="form-select" id="prerequisite-department-select-modal">
+                                        <option value="">جميع التخصصات</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="prerequisite-select-modal" class="form-label">المادة المتطلبة</label>
+                                    <select class="form-select" id="prerequisite-select-modal" required>
+                                        <option value="">اختر المادة المتطلبة</option>
+                                    </select>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-warning">إضافة متطلب</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Groups Modal -->
+    <div class="modal fade" id="courseGroupsModal" tabindex="-1" aria-labelledby="courseGroupsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="courseGroupsModalLabel">إدارة مجموعات المادة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="groups-loading" class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">جاري التحميل...</span>
+                        </div>
+                        <p>جاري تحميل بيانات المجموعات...</p>
+                    </div>
+                    <div id="groups-error" class="alert alert-danger d-none" role="alert">
+                        حدث خطأ أثناء تحميل بيانات المجموعات
+                    </div>
+                    <div id="groups-content" class="d-none">
+                        <div class="course-info mb-4">
+                            <h5 id="groups-course-name" class="mb-2"></h5>
+                            <p id="groups-course-details" class="text-muted"></p>
+                        </div>
+
+                        <h6 class="mt-4 mb-3">المجموعات الحالية</h6>
+                        <div id="current-groups-container">
+                            <div class="alert alert-info">لا توجد مجموعات لهذه المادة</div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h6 class="mb-3">إضافة مجموعة جديدة</h6>
+                            <form id="add-group-form">
+                                <input type="hidden" id="group-course-id">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="group-name" class="form-label">اسم المجموعة</label>
+                                        <input type="text" class="form-control" id="group-name" placeholder="مثال: أ، ب، ج، د" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="group-max-students" class="form-label">الحد الأقصى للطلبة</label>
+                                        <input type="number" class="form-control" id="group-max-students" min="1" value="30" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="group-professor" class="form-label">اسم الأستاذ (اختياري)</label>
+                                        <input type="text" class="form-control" id="group-professor" placeholder="اسم الأستاذ">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="group-time" class="form-label">التوقيت (اختياري)</label>
+                                        <input type="text" class="form-control" id="group-time" placeholder="مثال: الأحد 10-12">
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-success">إضافة مجموعة</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Group Modal -->
+    <div class="modal fade" id="editGroupModal" tabindex="-1" aria-labelledby="editGroupModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="editGroupModalLabel">تعديل مجموعة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="edit-group-form-error" class="alert alert-danger d-none" role="alert">
+                        حدث خطأ أثناء تعديل المجموعة
+                    </div>
+                    <div id="edit-group-form-success" class="alert alert-success d-none" role="alert">
+                        تم تعديل المجموعة بنجاح
+                    </div>
+                    <form id="edit-group-form">
+                        <input type="hidden" id="edit-group-id">
+                        <div class="mb-3">
+                            <label for="edit-group-name" class="form-label">اسم المجموعة</label>
+                            <input type="text" class="form-control" id="edit-group-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-group-max-students" class="form-label">الحد الأقصى للطلبة</label>
+                            <input type="number" class="form-control" id="edit-group-max-students" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-group-professor" class="form-label">اسم الأستاذ (اختياري)</label>
+                            <input type="text" class="form-control" id="edit-group-professor">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-group-time" class="form-label">التوقيت (اختياري)</label>
+                            <input type="text" class="form-control" id="edit-group-time">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-success" id="save-group-changes">حفظ التغييرات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Group Students Modal -->
+    <div class="modal fade" id="groupStudentsModal" tabindex="-1" aria-labelledby="groupStudentsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="groupStudentsModalLabel">طلبة المجموعة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="group-students-loading" class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">جاري التحميل...</span>
+                        </div>
+                        <p>جاري تحميل بيانات الطلبة...</p>
+                    </div>
+                    <div id="group-students-error" class="alert alert-danger d-none" role="alert">
+                        حدث خطأ أثناء تحميل بيانات الطلبة
+                    </div>
+                    <div id="group-students-content" class="d-none">
+                        <div class="group-info mb-4">
+                            <h5 id="group-students-name" class="mb-2"></h5>
+                            <p id="group-students-details" class="text-muted"></p>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>رقم القيد</th>
+                                        <th>اسم الطالب</th>
+                                        <th>التخصص</th>
+                                        <th>الفصل الدراسي</th>
+                                        <th>تاريخ التسجيل</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="group-students-table-body">
+                                    <!-- Students will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="no-group-students-message" class="alert alert-info d-none">
+                            لا يوجد طلبة مسجلين في هذه المجموعة
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cleanup Button -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+        <button id="fix-modals-button" class="btn btn-warning rounded-circle" style="width: 50px; height: 50px; display: none;" title="إصلاح النوافذ المنبثقة">
+            <i class="fas fa-tools"></i>
+        </button>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Responsive JS -->
+    <script src="../js/responsive.js"></script>
+    <!-- Responsive Tables JS -->
+    <script src="../js/responsive-tables.js"></script>
+    <!-- Number Input JS -->
+    <script src="../js/number-input.js"></script>
+    <!-- Modal Fixes JS -->
+    <script src="../js/modal-fixes.js"></script>
+    <script src="../js/main.js"></script>
+    <!-- Auto Logout JS -->
+    <script src="../js/auto-logout.js"></script>
+
+    <script>
+        // Setup fix modals button
+        document.addEventListener('DOMContentLoaded', function() {
+            const fixModalsButton = document.getElementById('fix-modals-button');
+            if (fixModalsButton) {
+                // Show button when backdrop is detected without open modals
+                setInterval(() => {
+                    const openModals = document.querySelectorAll('.modal.show');
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    if (backdrops.length > 0 && openModals.length === 0) {
+                        fixModalsButton.style.display = 'block';
+                    } else {
+                        fixModalsButton.style.display = 'none';
+                    }
+                }, 1000);
+
+                // Add click event to clean up modals
+                fixModalsButton.addEventListener('click', function() {
+                    if (typeof window.cleanupModals === 'function') {
+                        const result = window.cleanupModals();
+                        alert(`تم إصلاح النوافذ المنبثقة: تم إغلاق ${result.modalsCleanedUp} نافذة وإزالة ${result.backdropsRemoved} خلفية.`);
+                    } else {
+                        // Fallback cleanup
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                        alert('تم إصلاح النوافذ المنبثقة.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

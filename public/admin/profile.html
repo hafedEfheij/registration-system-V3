@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات الحساب - جامعة الحاضرة</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="../css/responsive.css">
+    <!-- Auto Logout CSS -->
+    <link rel="stylesheet" href="../css/auto-logout.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <img src="../images/images.jpg" alt="شعار الجامعة" class="img-fluid mb-3" style="max-height: 80px;">
+                        <h5 class="text-white">جامعة الحاضرة</h5>
+                        <p class="text-white fw-bold" id="user-role-title">لوحة تحكم المشرف</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <!-- Enlaces visibles solo para administradores -->
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fas fa-tachometer-alt"></i>
+                                لوحة التحكم
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="students.html">
+                                <i class="fas fa-user-graduate"></i>
+                                إدارة الطلبة
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="departments.html">
+                                <i class="fas fa-building"></i>
+                                إدارة التخصصات
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="courses.html">
+                                <i class="fas fa-book"></i>
+                                إدارة المواد
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="course-statistics.html">
+                                <i class="fas fa-chart-bar"></i>
+                                إحصائيات المواد
+                            </a>
+                        </li>
+                        <!-- Enlace visible para administradores y supervisores financieros -->
+                        <li class="nav-item admin-only financial-only">
+                            <a class="nav-link" href="payment-management.html">
+                                <i class="fas fa-money-bill-wave"></i>
+                                إدارة حالة الدفع
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link active" href="profile.html">
+                                <i class="fas fa-user-cog"></i>
+                                إعدادات الحساب
+                            </a>
+                        </li>
+                        <li class="nav-item mt-5">
+                            <a class="nav-link text-danger" href="#" id="sidebar-logout-button">
+                                <i class="fas fa-sign-out-alt"></i>
+                                تسجيل الخروج
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">إعدادات الحساب</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i>
+                                <span id="user-name">المشرف</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="profile.html">إعدادات الحساب</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logout-button">تسجيل الخروج</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">تعديل بيانات المشرف</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="profile-update-success" class="alert alert-success d-none" role="alert">
+                                    تم تحديث بيانات المشرف بنجاح
+                                </div>
+                                <div id="profile-update-error" class="alert alert-danger d-none" role="alert">
+                                    حدث خطأ أثناء تحديث البيانات
+                                </div>
+                                <form id="admin-profile-form" class="row g-3">
+                                    <div class="col-md-12 mb-3">
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            يجب إدخال رقم المنظومة الحالي (كلمة المرور الحالية) للتأكيد قبل إجراء أي تغييرات.
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="current-password" class="form-label">رقم المنظومة الحالي (كلمة المرور الحالية)</label>
+                                        <input type="password" class="form-control" id="current-password" required>
+                                    </div>
+                                    <div class="col-12"><hr></div>
+                                    <div class="col-md-6">
+                                        <label for="admin-username" class="form-label">رقم القيد الجديد (اسم المستخدم)</label>
+                                        <input type="text" class="form-control" id="admin-username" required>
+                                        <small class="form-text text-muted">يمكن استخدام الحروف العربية والإنجليزية، ويراعى حساسية الحروف الكبيرة والصغيرة</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="admin-password" class="form-label">رقم المنظومة الجديد (كلمة المرور)</label>
+                                        <input type="password" class="form-control" id="admin-password" required>
+                                        <small class="form-text text-muted">يمكن استخدام الحروف العربية والإنجليزية، ويراعى حساسية الحروف الكبيرة والصغيرة</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="admin-password-confirm" class="form-label">تأكيد رقم المنظومة الجديد</label>
+                                        <input type="password" class="form-control" id="admin-password-confirm" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('admin-profile-form').reset();">إعادة تعيين</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="card-title mb-0">معلومات الحساب</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold">نوع الحساب:</h6>
+                                            <p>مشرف النظام</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold">الصلاحيات:</h6>
+                                            <p>كاملة</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    ملاحظة: يرجى الحفاظ على سرية بيانات الدخول الخاصة بك وعدم مشاركتها مع أي شخص.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gestión de usuarios del supervisor financiero -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="card-title mb-0">إدارة حسابات المشرفين الماليين</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="financial-supervisor-success" class="alert alert-success d-none" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    تم تحديث بيانات المشرف المالي بنجاح
+                                </div>
+                                <div id="financial-supervisor-error" class="alert alert-danger d-none" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    حدث خطأ أثناء تحديث بيانات المشرف المالي
+                                </div>
+
+                                <!-- Lista de supervisores financieros -->
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-3">المشرفين الماليين الحاليين</h6>
+                                    <div id="financial-supervisors-list" class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">اسم المستخدم</th>
+                                                    <th scope="col">تاريخ الإنشاء</th>
+                                                    <th scope="col">الإجراءات</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="financial-supervisors-table-body">
+                                                <tr>
+                                                    <td colspan="4" class="text-center">جاري تحميل البيانات...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="no-financial-supervisors" class="alert alert-info d-none">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        لا يوجد مشرفين ماليين حاليًا. يمكنك إضافة مشرف مالي جديد باستخدام النموذج أدناه.
+                                    </div>
+                                </div>
+
+                                <!-- Formulario para agregar/editar supervisor financiero -->
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-success text-white">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-user-plus me-2"></i>
+                                            <span id="financial-supervisor-form-title">إضافة مشرف مالي جديد</span>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="financial-supervisor-form" class="row g-3">
+                                            <input type="hidden" id="financial-supervisor-id" value="">
+                                            <div class="col-md-6">
+                                                <label for="financial-supervisor-username" class="form-label">اسم المستخدم</label>
+                                                <input type="text" class="form-control" id="financial-supervisor-username" required>
+                                                <small class="form-text text-muted">يمكن استخدام الحروف العربية والإنجليزية، ويراعى حساسية الحروف الكبيرة والصغيرة</small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="financial-supervisor-password" class="form-label">كلمة المرور</label>
+                                                <input type="password" class="form-control" id="financial-supervisor-password" required>
+                                                <small class="form-text text-muted">يمكن استخدام الحروف العربية والإنجليزية، ويراعى حساسية الحروف الكبيرة والصغيرة</small>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="fas fa-save me-1"></i>
+                                                    <span id="financial-supervisor-submit-btn-text">إضافة مشرف مالي</span>
+                                                </button>
+                                                <button type="button" class="btn btn-secondary" id="reset-financial-supervisor-form">
+                                                    <i class="fas fa-undo me-1"></i>
+                                                    إعادة تعيين
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">إعدادات تسجيل الخروج التلقائي</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="auto-logout-update-success" class="alert alert-success d-none" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    تم تحديث إعدادات تسجيل الخروج التلقائي بنجاح
+                                </div>
+                                <div id="auto-logout-update-error" class="alert alert-danger d-none" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    حدث خطأ أثناء تحديث إعدادات تسجيل الخروج التلقائي
+                                </div>
+
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-header bg-primary text-white py-3">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-shield-alt me-2"></i>
+                                            إعدادات تسجيل الخروج التلقائي
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-4">
+                                            <div class="col-12">
+                                                <div class="alert alert-info border-start border-info border-4">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    تعزز هذه الميزة أمان النظام من خلال تسجيل خروج المستخدمين تلقائيًا بعد فترة من الخمول. يمكنك تفعيل أو تعطيل هذه الميزة وتحديد المدة الزمنية المناسبة.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <form id="auto-logout-settings-form" class="row g-4">
+                                            <div class="col-md-6">
+                                                <div class="card h-100 border-0 shadow-sm">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title text-primary mb-3">
+                                                            <i class="fas fa-toggle-on me-2"></i>
+                                                            حالة الميزة
+                                                        </h6>
+                                                        <div class="form-check form-switch form-switch-lg mb-3">
+                                                            <input class="form-check-input" type="checkbox" id="auto-logout-enabled">
+                                                            <label class="form-check-label ms-2 fw-bold" for="auto-logout-enabled">تفعيل تسجيل الخروج التلقائي</label>
+                                                        </div>
+                                                        <p class="form-text text-muted">
+                                                            <i class="fas fa-info-circle me-1"></i>
+                                                            عند تفعيل هذه الخاصية، سيتم تسجيل خروج المستخدم تلقائيًا بعد فترة من الخمول لتعزيز أمان النظام.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="card h-100 border-0 shadow-sm auto-logout-current-timeout-card">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title text-primary mb-3">
+                                                            <i class="fas fa-stopwatch me-2"></i>
+                                                            إعداد المؤقت
+                                                        </h6>
+                                                        <label for="auto-logout-timeout" class="form-label fw-bold">مدة الخمول (بالثواني)</label>
+                                                        <div class="input-group mb-3">
+                                                            <span class="input-group-text bg-primary text-white">
+                                                                <i class="fas fa-clock"></i>
+                                                            </span>
+                                                            <input type="number" class="form-control form-control-lg" id="auto-logout-timeout" min="5" required>
+                                                            <span class="input-group-text bg-primary text-white" id="current-timeout-display-container">
+                                                                <span id="current-timeout-display" class="text-white fw-bold">--:--</span>
+                                                            </span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center">
+                                                            <small class="form-text text-muted flex-grow-1">
+                                                                <i class="fas fa-info-circle me-1"></i>
+                                                                المدة الزمنية بالثواني قبل تسجيل الخروج التلقائي (الحد الأدنى 5 ثوان)
+                                                            </small>
+                                                            <small class="text-primary ms-2">
+                                                                <i class="fas fa-clock me-1"></i>
+                                                                <span>دقيقة:ثانية</span>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mt-4">
+                                                <div class="d-flex justify-content-end">
+                                                    <button type="button" class="btn btn-outline-secondary me-2" id="reset-auto-logout-settings">
+                                                        <i class="fas fa-undo me-1"></i>
+                                                        إعادة تعيين
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-save me-1"></i>
+                                                        حفظ الإعدادات
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Responsive JS -->
+    <script src="../js/responsive.js"></script>
+    <!-- Custom JS -->
+    <script src="../js/main.js"></script>
+    <script src="../js/admin-profile.js"></script>
+    <script src="../js/financial-supervisors.js"></script>
+    <!-- Auto Logout JS -->
+    <script src="../js/auto-logout.js"></script>
+
+    <script>
+        // Actualizar el título según el rol del usuario
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/user')
+                .then(response => response.json())
+                .then(data => {
+                    const userRoleTitle = document.getElementById('user-role-title');
+                    if (userRoleTitle && data.user) {
+                        if (data.user.role === 'financial_supervisor') {
+                            userRoleTitle.textContent = 'لوحة تحكم المشرف المالي';
+                            document.title = 'إعدادات الحساب - المشرف المالي';
+
+                            // Ocultar la sección de gestión de supervisores financieros para los supervisores financieros
+                            document.querySelectorAll('.row .card-header.bg-success').forEach(header => {
+                                if (header.textContent.includes('إدارة حسابات المشرفين الماليين')) {
+                                    const sectionRow = header.closest('.row');
+                                    if (sectionRow) {
+                                        sectionRow.classList.add('d-none');
+                                    }
+                                }
+                            });
+                        } else {
+                            userRoleTitle.textContent = 'لوحة تحكم المشرف';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user info:', error);
+                });
+        });
+    </script>
+</body>
+</html>
