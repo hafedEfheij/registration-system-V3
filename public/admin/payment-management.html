@@ -82,7 +82,22 @@
         }
         .student-info {
             font-size: 0.9rem;
-            color: #666;
+            color: #333;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .student-reg-number, .student-department {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 3px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            font-weight: 500;
+            color: #000;
         }
         .no-courses-message {
             padding: 1rem;
@@ -115,11 +130,27 @@
             }
             .student-info {
                 display: flex;
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 5px;
             }
             .student-info span {
                 margin: 0.1rem 0;
                 margin-left: 0 !important;
+                flex: 1 1 auto;
+                min-width: 150px;
+            }
+            .student-reg-number, .student-department {
+                display: inline-block;
+                background-color: rgba(255, 255, 255, 0.5);
+                padding: 3px 10px;
+                border-radius: 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
+                font-weight: 500;
+                color: #000;
             }
             .student-card .card-header .btn-sm {
                 font-size: 0.7rem;
@@ -933,8 +964,8 @@
                             </div>
                         </div>
                         <div class="student-info mt-1">
-                            <span><i class="fas fa-id-card me-1"></i> رقم المنظومة: ${student.registration_number}</span>
-                            <span class="ms-3"><i class="fas fa-building me-1"></i> التخصص: ${student.department_name || 'غير محدد'}</span>
+                            <span class="student-reg-number"><i class="fas fa-id-card me-1"></i> رقم المنظومة: ${student.registration_number}</span>
+                            <span class="student-department ms-3"><i class="fas fa-building me-1"></i> التخصص: ${student.department_name || 'غير محدد'}</span>
                         </div>
                     `;
                     studentCard.appendChild(cardHeader);
