@@ -602,10 +602,11 @@ function loadDepartments() {
                 if (departments.length === 0) {
                     departmentsTable.innerHTML = '<tr><td colspan="3" class="text-center">لا توجد تخصصات</td></tr>';
                 } else {
-                    departments.forEach(department => {
+                    // استخدام فهرس للترقيم التسلسلي بدلاً من معرف قاعدة البيانات
+                    departments.forEach((department, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${department.id}</td>
+                            <td>${index + 1}</td>
                             <td>${department.name}</td>
                             <td>
                                 <div class="d-flex flex-column flex-sm-row gap-1">
