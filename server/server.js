@@ -2,7 +2,11 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const db = require('./database');
+
+// Use Vercel-compatible database if on Vercel, otherwise use regular database
+const db = process.env.VERCEL === '1'
+  ? require('./vercel-database')
+  : require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
