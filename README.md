@@ -1,4 +1,4 @@
-#  جامعة الحاضرة- نظام تسجيل المواد
+#  جامعة الحاضرة- نظام تنزيل المواد 
 
 
 This is a university course registration system built with Node.js, Express, and SQLite.
